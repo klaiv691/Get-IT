@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Service log admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --paper:#EDEEE8; --card:#FBFBF8; --ink:#23262A; --ink-soft:#5B5F5A; --ink-faint:#8B8F87;
+    --line:#CBCDC3; --teal:#0F6E56; --teal-bg:#E1F2EC; --amber:#8A5A0B; --amber-bg:#FBEEDA; --red:#8A2E22;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'IBM Plex Sans', sans-serif;padding:32px 20px 80px;}
+  .wrap{max-width:920px;margin:0 auto;}
+  .masthead{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:22px;}
+  .masthead h1{font-family:'IBM Plex Mono', monospace;font-size:20px;font-weight:600;letter-spacing:0.06em;margin:0;text-transform:uppercase;}
+  .masthead .count{font-family:'IBM Plex Mono', monospace;font-size:12px;color:var(--ink-soft);}
+  input[type=text], input[type=email], input[type=password], select, textarea{
+    font-family:'IBM Plex Sans', sans-serif;background:var(--card);border:1px solid var(--line);
+    border-radius:3px;padding:9px 11px;font-size:13px;color:var(--ink);width:100%;
+  }
+  input:focus, select:focus, textarea:focus{outline:none;border-color:var(--ink);}
+  button.plain{font-family:'IBM Plex Mono', monospace;font-size:12px;background:var(--ink);color:var(--paper);border:none;border-radius:3px;padding:9px 14px;cursor:pointer;letter-spacing:0.03em;}
+  button.plain:hover{background:#3a3d40;}
+  button.ghost{font-family:'IBM Plex Mono', monospace;font-size:12px;background:transparent;color:var(--ink);border:1px solid var(--ink);border-radius:3px;padding:8px 13px;cursor:pointer;}
+  button.ghost:hover{background:var(--card);}
+
+  .login-box{max-width:340px;margin:60px auto;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:24px;}
+  .login-box label{display:block;font-family:'IBM Plex Mono', monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);margin-bottom:4px;}
+  .login-box .field{margin-bottom:14px;}
+  .login-error{color:var(--red);font-size:12px;margin-top:10px;font-family:'IBM Plex Mono', monospace;}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px;}
+  .search-input{flex:1;min-width:160px;}
+
+  .entry-form{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:18px;margin-bottom:24px;}
+  .entry-form .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+  .entry-form label{display:block;font-family:'IBM Plex Mono', monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);margin-bottom:4px;}
+  .entry-form textarea{resize:vertical;min-height:60px;font-family:'IBM Plex Sans', sans-serif;}
+  .field{margin-bottom:12px;}
+  .form-actions{display:flex;justify-content:space-between;align-items:center;margin-top:14px;}
+  .public-check{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-soft);}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media (max-width:640px){.grid{grid-template-columns:1fr;} .entry-form .grid2{grid-template-columns:1fr;}}
+  .ticket{background:var(--card);border:1px solid var(--line);border-radius:6px;overflow:hidden;}
+  .ticket-head{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-family:'IBM Plex Mono', monospace;font-size:11px;color:var(--ink-soft);border-bottom:1px dashed var(--line);}
+  .ticket-head .no{color:var(--ink);font-weight:600;}
+  .ticket-body{padding:14px;}
+  .ticket-body h3{margin:0 0 6px;font-size:15px;font-weight:600;}
+  .ticket-body p{margin:0 0 10px;font-size:13px;line-height:1.55;color:var(--ink-soft);}
+  .outcome{font-size:12.5px;color:var(--ink);background:var(--paper);border-radius:4px;padding:8px 10px;margin-bottom:10px;}
+  .outcome b{font-family:'IBM Plex Mono', monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);display:block;margin-bottom:3px;}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+  .tag{font-family:'IBM Plex Mono', monospace;font-size:10px;background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:2px 9px;color:var(--ink-soft);}
+  .cat-badge{font-family:'IBM Plex Mono', monospace;font-size:10px;text-transform:uppercase;padding:3px 8px;border-radius:3px;letter-spacing:0.03em;}
+  .cat-inspection{background:var(--teal-bg);color:var(--teal);}
+  .cat-repair{background:var(--amber-bg);color:var(--amber);}
+  .cat-osdualboot{background:#E6EEF7;color:#1D4E80;}
+  .cat-maintenance{background:#EFEAF8;color:#4B3480;}
+  .cat-other{background:var(--line);color:var(--ink-soft);}
+  .stamp{font-family:'IBM Plex Mono', monospace;font-size:9.5px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;border:1.5px solid;border-radius:3px;padding:2px 7px;transform:rotate(-3deg);}
+  .stamp.pub{color:var(--teal);border-color:var(--teal);}
+  .stamp.priv{color:var(--ink-faint);border-color:var(--ink-faint);}
+  .ticket-actions{display:flex;gap:8px;padding:0 14px 14px;}
+  .ticket-actions button{font-family:'IBM Plex Mono', monospace;font-size:10.5px;background:none;border:1px solid var(--line);border-radius:3px;padding:5px 10px;cursor:pointer;color:var(--ink-soft);}
+  .ticket-actions button:hover{border-color:var(--ink);color:var(--ink);}
+  .ticket-actions button.danger:hover{border-color:var(--red);color:var(--red);}
+  .empty, .loading{text-align:center;padding:60px 20px;color:var(--ink-faint);font-family:'IBM Plex Mono', monospace;font-size:13px;border:1px dashed var(--line);border-radius:6px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="masthead">
+    <h1>Service log admin</h1>
+    <div id="headerRight" class="count"></div>
+  </div>
+  <div id="app"><div class="loading">Checking session...</div></div>
+</div>
+
+<script>
+// ---- FILL THESE IN from Supabase > Project Settings > API ----
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+// ----------------------------------------------------------------
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const CATS = ['Inspection','Repair','OS / dual-boot','Maintenance','Other'];
+const catClass = c => 'cat-' + c.toLowerCase().replace(/[^a-z]/g,'');
+
+let entries = [];
+let editingId = null;
+let formOpen = false;
+
+function escapeHtml(s){ return (s||'').replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function fmtDate(d){ return new Date(d+'T00:00:00').toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'}); }
+function ticketNo(n){ return '#' + String(n).padStart(4,'0'); }
+
+async function checkSession(){
+  const { data:{ session } } = await sb.auth.getSession();
+  if(session) renderApp();
+  else renderLogin();
+}
+
+function renderLogin(err){
+  document.getElementById('headerRight').textContent = '';
+  document.getElementById('app').innerHTML = `
+    <div class="login-box">
+      <div class="field"><label>Email</label><input type="email" id="login-email"></div>
+      <div class="field"><label>Password</label><input type="password" id="login-pass"></div>
+      <button class="plain" id="login-btn" style="width:100%;">Log in</button>
+      ${err ? `<div class="login-error">${escapeHtml(err)}</div>` : ''}
+    </div>
+  `;
+  document.getElementById('login-btn').onclick = async ()=>{
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-pass').value;
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    if(error) renderLogin(error.message);
+    else renderApp();
+  };
+}
+
+async function renderApp(){
+  document.getElementById('headerRight').innerHTML = `<button class="ghost" id="logout-btn">Log out</button>`;
+  document.getElementById('logout-btn').onclick = async ()=>{ await sb.auth.signOut(); renderLogin(); };
+
+  document.getElementById('app').innerHTML = `
+    <div class="toolbar">
+      <input type="text" class="search-input" id="search" placeholder="Search title, notes, tags...">
+      <select id="filterCat">
+        <option value="">All categories</option>
+        ${CATS.map(c=>`<option value="${c}">${c}</option>`).join('')}
+      </select>
+      <button class="plain" id="btnNew">+ New entry</button>
+    </div>
+    <div id="formSlot"></div>
+    <div id="listSlot" class="loading">Loading entries...</div>
+  `;
+
+  document.getElementById('btnNew').onclick = ()=>{ editingId=null; formOpen=true; renderForm(); window.scrollTo({top:0, behavior:'smooth'}); };
+  document.getElementById('search').oninput = renderList;
+  document.getElementById('filterCat').onchange = renderList;
+
+  await loadEntries();
+}
+
+async function loadEntries(){
+  const { data, error } = await sb.from('projects').select('*').order('date', { ascending:false });
+  if(error){
+    document.getElementById('listSlot').innerHTML = `<div class="empty">Couldn't load entries: ${escapeHtml(error.message)}</div>`;
+    return;
+  }
+  entries = data;
+  renderList();
+}
+
+function renderForm(){
+  const slot = document.getElementById('formSlot');
+  if(!formOpen){ slot.innerHTML=''; return; }
+
+  const editing = editingId ? entries.find(e=>e.id===editingId) : null;
+  const title = editing ? editing.title : '';
+  const date = editing ? editing.date : new Date().toISOString().slice(0,10);
+  const category = editing ? editing.category : 'Inspection';
+  const description = editing ? editing.description : '';
+  const outcome = editing ? editing.outcome : '';
+  const tags = editing ? (editing.tags||[]).join(', ') : '';
+  const isPublic = editing ? editing.is_public : false;
+
+  slot.innerHTML = `
+    <div class="entry-form">
+      <div class="grid2">
+        <div class="field"><label>Project title</label><input type="text" id="f-title" value="${escapeHtml(title)}" placeholder="e.g. RTX 3050 laptop inspection - Njoroge"></div>
+        <div class="field"><label>Date</label><input type="text" id="f-date" value="${date}" placeholder="YYYY-MM-DD"></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Category</label>
+          <select id="f-category">${CATS.map(c=>`<option value="${c}" ${c===category?'selected':''}>${c}</option>`).join('')}</select>
+        </div>
+        <div class="field"><label>Tags (comma separated)</label><input type="text" id="f-tags" value="${escapeHtml(tags)}" placeholder="e.g. RTX3050, ArchiCAD, Nairobi"></div>
+      </div>
+      <div class="field"><label>What was the job</label><textarea id="f-desc">${escapeHtml(description)}</textarea></div>
+      <div class="field"><label>Outcome / result</label><textarea id="f-outcome">${escapeHtml(outcome)}</textarea></div>
+      <div class="form-actions">
+        <label class="public-check"><input type="checkbox" id="f-public" ${isPublic?'checked':''}> Mark shareable (visible on public portfolio)</label>
+        <div style="display:flex;gap:8px;">
+          <button class="ghost" id="f-cancel">Cancel</button>
+          <button class="plain" id="f-save">${editing?'Save changes':'Add entry'}</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('f-cancel').onclick = ()=>{ formOpen=false; editingId=null; renderForm(); };
+  document.getElementById('f-save').onclick = saveEntry;
+}
+
+async function saveEntry(){
+  const title = document.getElementById('f-title').value.trim();
+  const date = document.getElementById('f-date').value.trim();
+  if(!title || !date){ alert('Title and date are required.'); return; }
+
+  const payload = {
+    title,
+    date,
+    category: document.getElementById('f-category').value,
+    description: document.getElementById('f-desc').value.trim(),
+    outcome: document.getElementById('f-outcome').value.trim(),
+    tags: document.getElementById('f-tags').value.split(',').map(t=>t.trim()).filter(Boolean),
+    is_public: document.getElementById('f-public').checked
+  };
+
+  let error;
+  if(editingId){
+    ({ error } = await sb.from('projects').update(payload).eq('id', editingId));
+  }else{
+    ({ error } = await sb.from('projects').insert(payload));
+  }
+  if(error){ alert('Save failed: ' + error.message); return; }
+
+  formOpen = false;
+  editingId = null;
+  await loadEntries();
+}
+
+function editEntry(id){ editingId=id; formOpen=true; renderForm(); window.scrollTo({top:0, behavior:'smooth'}); }
+
+async function deleteEntry(id){
+  if(!confirm('Delete this entry?')) return;
+  const { error } = await sb.from('projects').delete().eq('id', id);
+  if(error){ alert('Delete failed: ' + error.message); return; }
+  await loadEntries();
+}
+
+async function togglePublic(id){
+  const e = entries.find(e=>e.id===id);
+  const { error } = await sb.from('projects').update({ is_public: !e.is_public }).eq('id', id);
+  if(error){ alert('Update failed: ' + error.message); return; }
+  await loadEntries();
+}
+
+function renderList(){
+  const slot = document.getElementById('listSlot');
+  const search = document.getElementById('search').value.toLowerCase();
+  const filterCat = document.getElementById('filterCat').value;
+
+  let list = [...entries];
+  if(filterCat) list = list.filter(e=>e.category===filterCat);
+  if(search){
+    list = list.filter(e =>
+      e.title.toLowerCase().includes(search) ||
+      (e.description||'').toLowerCase().includes(search) ||
+      (e.outcome||'').toLowerCase().includes(search) ||
+      (e.tags||[]).some(t=>t.toLowerCase().includes(search))
+    );
+  }
+
+  if(list.length===0){
+    slot.innerHTML = `<div class="empty">No entries match.</div>`;
+    return;
+  }
+
+  slot.innerHTML = `<div class="grid">${list.map(e => `
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="no">${ticketNo(e.ticket_no)}</span>
+        <span>${fmtDate(e.date)}</span>
+        <span class="stamp ${e.is_public?'pub':'priv'}">${e.is_public?'shareable':'private'}</span>
+      </div>
+      <div class="ticket-body">
+        <span class="cat-badge ${catClass(e.category)}">${escapeHtml(e.category)}</span>
+        <h3 style="margin-top:8px;">${escapeHtml(e.title)}</h3>
+        ${e.description ? `<p>${escapeHtml(e.description)}</p>` : ''}
+        ${e.outcome ? `<div class="outcome"><b>Outcome</b>${escapeHtml(e.outcome)}</div>` : ''}
+        ${(e.tags && e.tags.length) ? `<div class="tags">${e.tags.map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+      </div>
+      <div class="ticket-actions">
+        <button onclick="editEntry('${e.id}')">Edit</button>
+        <button onclick="togglePublic('${e.id}')">${e.is_public?'Make private':'Mark shareable'}</button>
+        <button class="danger" onclick="deleteEntry('${e.id}')">Delete</button>
+      </div>
+    </div>
+  `).join('')}</div>`;
+}
+
+checkSession();
+</script>
+</body>
+</html>

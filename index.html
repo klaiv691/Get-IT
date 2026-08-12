@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --paper:#EDEEE8; --card:#FBFBF8; --ink:#23262A; --ink-soft:#5B5F5A; --ink-faint:#8B8F87;
+    --line:#CBCDC3; --teal:#0F6E56; --teal-bg:#E1F2EC; --amber:#8A5A0B; --amber-bg:#FBEEDA;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'IBM Plex Sans', sans-serif;padding:32px 20px 80px;}
+  .wrap{max-width:920px;margin:0 auto;}
+  .masthead{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:22px;}
+  .masthead h1{font-family:'IBM Plex Mono', monospace;font-size:20px;font-weight:600;letter-spacing:0.06em;margin:0;text-transform:uppercase;}
+  .masthead .count{font-family:'IBM Plex Mono', monospace;font-size:12px;color:var(--ink-soft);}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media (max-width:640px){.grid{grid-template-columns:1fr;}}
+  .ticket{background:var(--card);border:1px solid var(--line);border-radius:6px;overflow:hidden;}
+  .ticket-head{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-family:'IBM Plex Mono', monospace;font-size:11px;color:var(--ink-soft);border-bottom:1px dashed var(--line);}
+  .ticket-head .no{color:var(--ink);font-weight:600;}
+  .ticket-body{padding:14px;}
+  .ticket-body h3{margin:0 0 6px;font-size:15px;font-weight:600;}
+  .ticket-body p{margin:0 0 10px;font-size:13px;line-height:1.55;color:var(--ink-soft);}
+  .outcome{font-size:12.5px;color:var(--ink);background:var(--paper);border-radius:4px;padding:8px 10px;margin-bottom:10px;}
+  .outcome b{font-family:'IBM Plex Mono', monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);display:block;margin-bottom:3px;}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;}
+  .tag{font-family:'IBM Plex Mono', monospace;font-size:10px;background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:2px 9px;color:var(--ink-soft);}
+  .cat-badge{font-family:'IBM Plex Mono', monospace;font-size:10px;text-transform:uppercase;padding:3px 8px;border-radius:3px;letter-spacing:0.03em;}
+  .cat-inspection{background:var(--teal-bg);color:var(--teal);}
+  .cat-repair{background:var(--amber-bg);color:var(--amber);}
+  .cat-osdualboot{background:#E6EEF7;color:#1D4E80;}
+  .cat-maintenance{background:#EFEAF8;color:#4B3480;}
+  .cat-other{background:var(--line);color:var(--ink-soft);}
+  .empty, .loading{text-align:center;padding:60px 20px;color:var(--ink-faint);font-family:'IBM Plex Mono', monospace;font-size:13px;border:1px dashed var(--line);border-radius:6px;}
+  .footnote{margin-top:18px;font-size:11.5px;color:var(--ink-faint);text-align:center;font-family:'IBM Plex Mono', monospace;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="masthead">
+    <h1>Project portfolio</h1>
+    <div class="count" id="count">Loading...</div>
+  </div>
+  <div id="list" class="loading">Loading entries...</div>
+  <div class="footnote">Selected work, shared by request.</div>
+</div>
+
+<script>
+// ---- FILL THESE IN from Supabase > Project Settings > API ----
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+// ----------------------------------------------------------------
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const catClass = c => 'cat-' + c.toLowerCase().replace(/[^a-z]/g,'');
+
+function escapeHtml(s){ return (s||'').replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function fmtDate(d){ return new Date(d+'T00:00:00').toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'}); }
+function ticketNo(n){ return '#' + String(n).padStart(4,'0'); }
+
+async function load(){
+  const { data, error } = await sb
+    .from('projects')
+    .select('*')
+    .eq('is_public', true)
+    .order('date', { ascending: false });
+
+  const listEl = document.getElementById('list');
+  const countEl = document.getElementById('count');
+
+  if(error){
+    listEl.innerHTML = `<div class="empty">Couldn't load entries. Check the Supabase URL and key are correct.</div>`;
+    countEl.textContent = '';
+    console.error(error);
+    return;
+  }
+
+  countEl.textContent = `${data.length} ${data.length===1?'entry':'entries'}`;
+
+  if(data.length === 0){
+    listEl.innerHTML = `<div class="empty">No entries published yet.</div>`;
+    return;
+  }
+
+  listEl.innerHTML = `<div class="grid">${data.map(e => `
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="no">${ticketNo(e.ticket_no)}</span>
+        <span>${fmtDate(e.date)}</span>
+      </div>
+      <div class="ticket-body">
+        <span class="cat-badge ${catClass(e.category)}">${escapeHtml(e.category)}</span>
+        <h3 style="margin-top:8px;">${escapeHtml(e.title)}</h3>
+        ${e.description ? `<p>${escapeHtml(e.description)}</p>` : ''}
+        ${e.outcome ? `<div class="outcome"><b>Outcome</b>${escapeHtml(e.outcome)}</div>` : ''}
+        ${(e.tags && e.tags.length) ? `<div class="tags">${e.tags.map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+      </div>
+    </div>
+  `).join('')}</div>`;
+}
+
+load();
+</script>
+</body>
+</html>
