@@ -10,25 +10,46 @@
 <style>
   :root{
     --paper:#EDEEE8; --card:#FBFBF8; --ink:#23262A; --ink-soft:#5B5F5A; --ink-faint:#8B8F87;
-    --line:#CBCDC3; --teal:#0F6E56; --teal-bg:#E1F2EC; --amber:#8A5A0B; --amber-bg:#FBEEDA; --red:#8A2E22;
+    --line:#CBCDC3; --line-soft:#DEDFD8;
+    --teal:#0F6E56; --teal-bg:#E1F2EC; --amber:#8A5A0B; --amber-bg:#FBEEDA;
+    --blue:#1D4E80; --blue-bg:#E6EEF7; --purple:#4B3480; --purple-bg:#EFEAF8; --red:#8A2E22;
+    --radius-sm:6px; --radius:10px;
+    --shadow-sm:0 1px 2px rgba(35,38,42,.05);
+    --shadow-md:0 6px 20px -4px rgba(35,38,42,.12), 0 2px 6px rgba(35,38,42,.06);
+    --shadow-lift:0 16px 32px -10px rgba(35,38,42,.20), 0 4px 10px rgba(35,38,42,.08);
+    --ease:cubic-bezier(.4,0,.2,1);
   }
   *{box-sizing:border-box;}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:'IBM Plex Sans', sans-serif;padding:32px 20px 80px;}
-  .wrap{max-width:920px;margin:0 auto;}
-  .masthead{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:22px;}
-  .masthead h1{font-family:'IBM Plex Mono', monospace;font-size:20px;font-weight:600;letter-spacing:0.06em;margin:0;text-transform:uppercase;}
+  body{
+    margin:0;color:var(--ink);font-family:'IBM Plex Sans', sans-serif;padding:40px 20px 80px;
+    background:
+      radial-gradient(circle at 1px 1px, rgba(35,38,42,.05) 1px, transparent 0) 0 0/18px 18px,
+      var(--paper);
+  }
+  ::selection{background:var(--ink);color:var(--paper);}
+  .wrap{max-width:960px;margin:0 auto;}
+  .masthead{display:flex;justify-content:space-between;align-items:center;gap:16px;border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:26px;}
+  .masthead-left{display:flex;align-items:center;gap:14px;}
+  .mark{width:40px;height:40px;flex-shrink:0;background:var(--ink);color:var(--paper);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:14px;box-shadow:var(--shadow-sm);}
+  .masthead h1{font-family:'IBM Plex Mono', monospace;font-size:19px;font-weight:600;letter-spacing:0.05em;margin:0;text-transform:uppercase;}
   .masthead .count{font-family:'IBM Plex Mono', monospace;font-size:12px;color:var(--ink-soft);}
+
   input[type=text], input[type=email], input[type=password], select, textarea{
     font-family:'IBM Plex Sans', sans-serif;background:var(--card);border:1px solid var(--line);
-    border-radius:3px;padding:9px 11px;font-size:13px;color:var(--ink);width:100%;
+    border-radius:var(--radius-sm);padding:9px 11px;font-size:13px;color:var(--ink);width:100%;
+    box-shadow:inset 0 1px 2px rgba(35,38,42,.04);
+    transition:border-color 160ms var(--ease), box-shadow 160ms var(--ease);
   }
-  input:focus, select:focus, textarea:focus{outline:none;border-color:var(--ink);}
-  button.plain{font-family:'IBM Plex Mono', monospace;font-size:12px;background:var(--ink);color:var(--paper);border:none;border-radius:3px;padding:9px 14px;cursor:pointer;letter-spacing:0.03em;}
-  button.plain:hover{background:#3a3d40;}
-  button.ghost{font-family:'IBM Plex Mono', monospace;font-size:12px;background:transparent;color:var(--ink);border:1px solid var(--ink);border-radius:3px;padding:8px 13px;cursor:pointer;}
-  button.ghost:hover{background:var(--card);}
+  input:focus, select:focus, textarea:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(35,38,42,.08);}
+  button.plain{font-family:'IBM Plex Mono', monospace;font-size:12px;background:var(--ink);color:var(--paper);border:none;border-radius:var(--radius-sm);padding:9px 14px;cursor:pointer;letter-spacing:0.03em;box-shadow:var(--shadow-sm);transition:background 160ms var(--ease), box-shadow 160ms var(--ease), transform 120ms var(--ease);}
+  button.plain:hover{background:#3a3d40;box-shadow:var(--shadow-md);}
+  button.plain:active{transform:translateY(1px);}
+  button.ghost{font-family:'IBM Plex Mono', monospace;font-size:12px;background:transparent;color:var(--ink);border:1px solid var(--ink);border-radius:var(--radius-sm);padding:8px 13px;cursor:pointer;transition:background 160ms var(--ease), box-shadow 160ms var(--ease);}
+  button.ghost:hover{background:var(--card);box-shadow:var(--shadow-sm);}
 
-  .login-box{max-width:340px;margin:60px auto;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:24px;}
+  .login-wrap{display:flex;flex-direction:column;align-items:center;margin-top:56px;}
+  .login-wrap .mark{margin-bottom:16px;width:44px;height:44px;font-size:15px;}
+  .login-box{max-width:340px;width:100%;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-md);}
   .login-box label{display:block;font-family:'IBM Plex Mono', monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);margin-bottom:4px;}
   .login-box .field{margin-bottom:14px;}
   .login-error{color:var(--red);font-size:12px;margin-top:10px;font-family:'IBM Plex Mono', monospace;}
@@ -36,49 +57,69 @@
   .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px;}
   .search-input{flex:1;min-width:160px;}
 
-  .entry-form{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:18px;margin-bottom:24px;}
+  .entry-form{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:24px;box-shadow:var(--shadow-md);}
   .entry-form .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
   .entry-form label{display:block;font-family:'IBM Plex Mono', monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);margin-bottom:4px;}
   .entry-form textarea{resize:vertical;min-height:60px;font-family:'IBM Plex Sans', sans-serif;}
   .field{margin-bottom:12px;}
-  .form-actions{display:flex;justify-content:space-between;align-items:center;margin-top:14px;}
+  .form-actions{display:flex;justify-content:space-between;align-items:center;margin-top:14px;flex-wrap:wrap;gap:10px;}
   .public-check{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-soft);}
 
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
   @media (max-width:640px){.grid{grid-template-columns:1fr;} .entry-form .grid2{grid-template-columns:1fr;}}
-  .ticket{background:var(--card);border:1px solid var(--line);border-radius:6px;overflow:hidden;}
-  .ticket-head{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-family:'IBM Plex Mono', monospace;font-size:11px;color:var(--ink-soft);border-bottom:1px dashed var(--line);}
+  .ticket{
+    background:var(--card);border:1px solid var(--line);border-left:4px solid var(--ink-faint);
+    border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);
+    transition:transform 220ms var(--ease), box-shadow 220ms var(--ease);
+    opacity:0;transform:translateY(10px);animation:riseIn 420ms var(--ease) forwards;
+    animation-delay:calc(var(--i, 0) * 45ms);
+  }
+  .ticket:hover{transform:translateY(-4px);box-shadow:var(--shadow-lift);}
+  @keyframes riseIn{to{opacity:1;transform:translateY(0);}}
+  .ticket.cat-inspection{border-left-color:var(--teal);}
+  .ticket.cat-repair{border-left-color:var(--amber);}
+  .ticket.cat-osdualboot{border-left-color:var(--blue);}
+  .ticket.cat-maintenance{border-left-color:var(--purple);}
+  .ticket.cat-other{border-left-color:var(--ink-faint);}
+
+  .ticket-head{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-family:'IBM Plex Mono', monospace;font-size:11px;color:var(--ink-soft);border-bottom:1px dashed var(--line-soft);background:rgba(35,38,42,.015);}
   .ticket-head .no{color:var(--ink);font-weight:600;}
   .ticket-body{padding:14px;}
-  .ticket-body h3{margin:0 0 6px;font-size:15px;font-weight:600;}
-  .ticket-body p{margin:0 0 10px;font-size:13px;line-height:1.55;color:var(--ink-soft);}
-  .outcome{font-size:12.5px;color:var(--ink);background:var(--paper);border-radius:4px;padding:8px 10px;margin-bottom:10px;}
+  .ticket-body h3{margin:0 0 6px;font-size:15px;font-weight:600;letter-spacing:.01em;}
+  .ticket-body p{margin:0 0 10px;font-size:13px;line-height:1.6;color:var(--ink-soft);}
+  .outcome{font-size:12.5px;color:var(--ink);background:var(--paper);border-radius:var(--radius-sm);padding:9px 11px;margin-bottom:10px;}
   .outcome b{font-family:'IBM Plex Mono', monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);display:block;margin-bottom:3px;}
   .tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
-  .tag{font-family:'IBM Plex Mono', monospace;font-size:10px;background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:2px 9px;color:var(--ink-soft);}
-  .cat-badge{font-family:'IBM Plex Mono', monospace;font-size:10px;text-transform:uppercase;padding:3px 8px;border-radius:3px;letter-spacing:0.03em;}
-  .cat-inspection{background:var(--teal-bg);color:var(--teal);}
-  .cat-repair{background:var(--amber-bg);color:var(--amber);}
-  .cat-osdualboot{background:#E6EEF7;color:#1D4E80;}
-  .cat-maintenance{background:#EFEAF8;color:#4B3480;}
-  .cat-other{background:var(--line);color:var(--ink-soft);}
-  .stamp{font-family:'IBM Plex Mono', monospace;font-size:9.5px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;border:1.5px solid;border-radius:3px;padding:2px 7px;transform:rotate(-3deg);}
+  .tag{font-family:'IBM Plex Mono', monospace;font-size:10px;background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:3px 9px;color:var(--ink-soft);}
+  .cat-badge{display:inline-flex;align-items:center;gap:5px;font-family:'IBM Plex Mono', monospace;font-size:10px;font-weight:500;text-transform:uppercase;padding:4px 10px 4px 8px;border-radius:20px;letter-spacing:0.04em;}
+  .cat-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;}
+  .cat-badge.cat-inspection{background:var(--teal-bg);color:var(--teal);}
+  .cat-badge.cat-repair{background:var(--amber-bg);color:var(--amber);}
+  .cat-badge.cat-osdualboot{background:var(--blue-bg);color:var(--blue);}
+  .cat-badge.cat-maintenance{background:var(--purple-bg);color:var(--purple);}
+  .cat-badge.cat-other{background:var(--line);color:var(--ink-soft);}
+  .stamp{font-family:'IBM Plex Mono', monospace;font-size:9.5px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;border:1.5px solid;border-radius:var(--radius-sm);padding:2px 7px;transform:rotate(-3deg);}
   .stamp.pub{color:var(--teal);border-color:var(--teal);}
   .stamp.priv{color:var(--ink-faint);border-color:var(--ink-faint);}
   .ticket-actions{display:flex;gap:8px;padding:0 14px 14px;}
-  .ticket-actions button{font-family:'IBM Plex Mono', monospace;font-size:10.5px;background:none;border:1px solid var(--line);border-radius:3px;padding:5px 10px;cursor:pointer;color:var(--ink-soft);}
+  .ticket-actions button{font-family:'IBM Plex Mono', monospace;font-size:10.5px;background:none;border:1px solid var(--line);border-radius:var(--radius-sm);padding:5px 10px;cursor:pointer;color:var(--ink-soft);transition:border-color 160ms var(--ease), color 160ms var(--ease);}
   .ticket-actions button:hover{border-color:var(--ink);color:var(--ink);}
   .ticket-actions button.danger:hover{border-color:var(--red);color:var(--red);}
-  .empty, .loading{text-align:center;padding:60px 20px;color:var(--ink-faint);font-family:'IBM Plex Mono', monospace;font-size:13px;border:1px dashed var(--line);border-radius:6px;}
+  .empty, .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:64px 20px;color:var(--ink-faint);font-family:'IBM Plex Mono', monospace;font-size:13px;border:1px dashed var(--line);border-radius:var(--radius);}
+  .spinner{width:20px;height:20px;border:2px solid var(--line);border-top-color:var(--ink-soft);border-radius:50%;animation:spin 800ms linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="masthead">
-    <h1>Service log admin</h1>
+    <div class="masthead-left">
+      <div class="mark">GI</div>
+      <h1>Service log admin</h1>
+    </div>
     <div id="headerRight" class="count"></div>
   </div>
-  <div id="app"><div class="loading">Checking session...</div></div>
+  <div id="app"><div class="loading"><div class="spinner"></div>Checking session...</div></div>
 </div>
 
 <script>
@@ -108,11 +149,14 @@ async function checkSession(){
 function renderLogin(err){
   document.getElementById('headerRight').textContent = '';
   document.getElementById('app').innerHTML = `
-    <div class="login-box">
-      <div class="field"><label>Email</label><input type="email" id="login-email"></div>
-      <div class="field"><label>Password</label><input type="password" id="login-pass"></div>
-      <button class="plain" id="login-btn" style="width:100%;">Log in</button>
-      ${err ? `<div class="login-error">${escapeHtml(err)}</div>` : ''}
+    <div class="login-wrap">
+      <div class="mark">GI</div>
+      <div class="login-box">
+        <div class="field"><label>Email</label><input type="email" id="login-email"></div>
+        <div class="field"><label>Password</label><input type="password" id="login-pass"></div>
+        <button class="plain" id="login-btn" style="width:100%;">Log in</button>
+        ${err ? `<div class="login-error">${escapeHtml(err)}</div>` : ''}
+      </div>
     </div>
   `;
   document.getElementById('login-btn').onclick = async ()=>{
@@ -138,7 +182,7 @@ async function renderApp(){
       <button class="plain" id="btnNew">+ New entry</button>
     </div>
     <div id="formSlot"></div>
-    <div id="listSlot" class="loading">Loading entries...</div>
+    <div id="listSlot" class="loading"><div class="spinner"></div>Loading entries...</div>
   `;
 
   document.getElementById('btnNew').onclick = ()=>{ editingId=null; formOpen=true; renderForm(); window.scrollTo({top:0, behavior:'smooth'}); };
@@ -264,8 +308,8 @@ function renderList(){
     return;
   }
 
-  slot.innerHTML = `<div class="grid">${list.map(e => `
-    <div class="ticket">
+  slot.innerHTML = `<div class="grid">${list.map((e, i) => `
+    <div class="ticket ${catClass(e.category)}" style="--i:${i}">
       <div class="ticket-head">
         <span class="no">${ticketNo(e.ticket_no)}</span>
         <span>${fmtDate(e.date)}</span>
