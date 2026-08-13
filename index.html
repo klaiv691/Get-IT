@@ -64,6 +64,7 @@ async function load(){
 
   listEl.innerHTML = `<div class="grid">${data.map((e, i) => `
     <div class="ticket ${catClass(e.category)}" style="--i:${i}">
+      ${e.featured_image ? `<img class="ticket-image" src="${storageUrl(e.featured_image)}" alt="">` : ''}
       <div class="ticket-head">
         <span class="no">${ticketNo(e.ticket_no)}</span>
         <span>${fmtDate(e.date)}</span>

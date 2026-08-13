@@ -70,6 +70,7 @@ input:focus, select:focus, textarea:focus{outline:none;border-color:var(--gold);
   animation-delay:calc(var(--i, 0) * 45ms);
 }
 .ticket:hover{transform:translateY(-4px);box-shadow:var(--shadow-lift);}
+.ticket-image{width:100%;height:160px;object-fit:cover;display:block;background:var(--paper);}
 @keyframes riseIn{to{opacity:1;transform:translateY(0);}}
 .ticket.cat-inspection{border-left-color:var(--navy);}
 .ticket.cat-repair{border-left-color:var(--maroon);}
