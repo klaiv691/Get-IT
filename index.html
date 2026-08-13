@@ -84,6 +84,8 @@
   .spinner{width:20px;height:20px;border:2px solid var(--line);border-top-color:var(--navy);border-radius:50%;animation:spin 800ms linear infinite;}
   @keyframes spin{to{transform:rotate(360deg);}}
   .footnote{margin-top:26px;padding-top:18px;font-size:12px;color:var(--ink-faint);text-align:center;border-top:1px dashed var(--line);}
+  .admin-link{color:var(--ink-faint);text-decoration:none;border-bottom:1px dotted var(--ink-faint);transition:color 160ms var(--ease), border-color 160ms var(--ease);}
+  .admin-link:hover{color:var(--navy);border-color:var(--navy);}
 </style>
 </head>
 <body>
@@ -109,7 +111,7 @@
 </div>
 <main class="wrap">
   <div id="list" class="loading"><div class="spinner"></div>Loading entries...</div>
-  <div class="footnote">Selected work, shared by request.</div>
+  <div class="footnote">Selected work, shared by request. · <a href="admin.html" class="admin-link">Admin login</a></div>
 </main>
 
 <script>
