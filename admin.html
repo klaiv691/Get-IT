@@ -3,54 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Service log admin · Get-IT</title>
+<title>Case study admin · Get-IT</title>
 <link rel="icon" type="image/png" href="assets/logo-icon.png">
+<link rel="stylesheet" href="assets/style.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=URW+Bookman:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/app.js"></script>
 <style>
-  :root{
-    --navy:#102A57; --maroon:#4A0E16; --gold:#D4A017; --cream:#E8DCC9;
-    --paper:#F4EFE4; --card:#FCFAF4;
-    --ink:#262A33; --ink-soft:#585C66; --ink-faint:#8A8D93;
-    --line:#DDD4C2; --line-soft:#E9E2D4; --red:#8A2E22;
-    --plum:#3A2140; --plum-bg:#EDE7EE;
-    --gold-ink:#8A6414; --gold-bg:#F7EACE;
-    --navy-bg:#E4E8F0; --maroon-bg:#F3E3E1; --grey-bg:#E9E9E5;
-    --radius-sm:6px; --radius:10px;
-    --shadow-sm:0 1px 2px rgba(16,42,87,.06);
-    --shadow-md:0 6px 20px -4px rgba(16,42,87,.14), 0 2px 6px rgba(16,42,87,.07);
-    --shadow-lift:0 16px 32px -10px rgba(16,42,87,.22), 0 4px 10px rgba(16,42,87,.09);
-    --ease:cubic-bezier(.4,0,.2,1);
-    --serif:'Bookman Old Style', 'URW Bookman', Georgia, serif;
-  }
-  *{box-sizing:border-box;}
-  body{margin:0;color:var(--ink);font-family:var(--serif);background:var(--paper);}
-  ::selection{background:var(--navy);color:var(--cream);}
-  .wrap{max-width:960px;margin:0 auto;padding:0 20px;}
-
-  .masthead{background:var(--navy);padding:18px 0;}
-  .masthead .row{display:flex;justify-content:space-between;align-items:center;gap:16px;}
-  .masthead-left{display:flex;align-items:center;gap:14px;}
-  .mark{width:42px;height:42px;flex-shrink:0;border-radius:var(--radius-sm);box-shadow:var(--shadow-sm);}
-  .masthead h1{font-size:18px;font-weight:700;color:#FFFFFF;letter-spacing:.02em;margin:0;}
-  .masthead .count{font-size:12px;color:var(--cream);opacity:.9;}
-  .hairline{height:4px;background:var(--gold);}
-  main{padding:28px 0 70px;}
-
-  input[type=text], input[type=email], input[type=password], select, textarea{
-    font-family:var(--serif);background:var(--card);border:1px solid var(--line);
-    border-radius:var(--radius-sm);padding:9px 11px;font-size:13.5px;color:var(--ink);width:100%;
-    box-shadow:inset 0 1px 2px rgba(16,42,87,.04);
-    transition:border-color 160ms var(--ease), box-shadow 160ms var(--ease);
-  }
-  input:focus, select:focus, textarea:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(16,42,87,.10);}
-  button.plain{font-family:var(--serif);font-size:13px;font-weight:700;background:var(--navy);color:#FFFFFF;border:none;border-radius:var(--radius-sm);padding:9px 15px;cursor:pointer;letter-spacing:0.02em;box-shadow:var(--shadow-sm);transition:background 160ms var(--ease), box-shadow 160ms var(--ease), transform 120ms var(--ease);}
-  button.plain:hover{background:#1a3a70;box-shadow:var(--shadow-md);}
-  button.plain:active{transform:translateY(1px);}
-  button.ghost{font-family:var(--serif);font-size:13px;font-weight:700;background:transparent;color:var(--navy);border:1px solid var(--navy);border-radius:var(--radius-sm);padding:8px 14px;cursor:pointer;transition:background 160ms var(--ease), box-shadow 160ms var(--ease);}
-  button.ghost:hover{background:var(--navy-bg);box-shadow:var(--shadow-sm);}
-
   .login-wrap{display:flex;flex-direction:column;align-items:center;margin-top:56px;}
   .login-wrap .mark{margin-bottom:16px;width:46px;height:46px;}
   .login-box{max-width:340px;width:100%;background:var(--maroon);border:1px solid var(--gold);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow-md);}
@@ -58,60 +18,42 @@
   .login-box .field{margin-bottom:14px;}
   .login-error{color:#F3C6BE;font-size:12.5px;margin-top:10px;}
 
-  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px;}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:var(--space-5);}
   .search-input{flex:1;min-width:160px;}
+  .toolbar select{width:auto;min-width:140px;}
 
-  .entry-form{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:24px;box-shadow:var(--shadow-md);}
-  .entry-form .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+  .entry-form{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:var(--space-5);margin-bottom:var(--space-6);box-shadow:var(--shadow-md);}
+  .entry-form .grid2{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);margin-bottom:var(--space-3);}
   .entry-form label{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-soft);margin-bottom:4px;}
   .entry-form textarea{resize:vertical;min-height:60px;}
-  .field{margin-bottom:12px;}
-  .form-actions{display:flex;justify-content:space-between;align-items:center;margin-top:14px;flex-wrap:wrap;gap:10px;}
+  .field{margin-bottom:var(--space-3);}
+  .field-hint{font-size:11px;color:var(--ink-faint);margin-top:4px;}
+  .form-section-title{font-size:13px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.05em;margin:var(--space-5) 0 var(--space-3);padding-top:var(--space-4);border-top:1px dashed var(--line);}
+  .form-section-title:first-child{margin-top:0;padding-top:0;border-top:none;}
+  .form-actions{display:flex;justify-content:space-between;align-items:center;margin-top:var(--space-4);flex-wrap:wrap;gap:10px;}
   .public-check{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-soft);}
+  .check-row{display:flex;gap:var(--space-5);flex-wrap:wrap;}
 
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-  @media (max-width:640px){.grid{grid-template-columns:1fr;} .entry-form .grid2{grid-template-columns:1fr;}}
-  .ticket{
-    background:var(--card);border:1px solid var(--line);border-left:4px solid var(--ink-faint);
-    border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);
-    transition:transform 220ms var(--ease), box-shadow 220ms var(--ease);
-    opacity:0;transform:translateY(10px);animation:riseIn 420ms var(--ease) forwards;
-    animation-delay:calc(var(--i, 0) * 45ms);
-  }
-  .ticket:hover{transform:translateY(-4px);box-shadow:var(--shadow-lift);}
-  @keyframes riseIn{to{opacity:1;transform:translateY(0);}}
-  .ticket.cat-inspection{border-left-color:var(--navy);}
-  .ticket.cat-repair{border-left-color:var(--maroon);}
-  .ticket.cat-osdualboot{border-left-color:var(--gold);}
-  .ticket.cat-maintenance{border-left-color:var(--plum);}
-  .ticket.cat-other{border-left-color:var(--ink-faint);}
+  .vocab-domain{border:1px solid var(--line);border-radius:var(--radius-sm);margin-bottom:8px;background:var(--paper);}
+  .vocab-domain summary{cursor:pointer;padding:9px 12px;font-size:12.5px;font-weight:700;color:var(--navy);list-style:revert;}
+  .vocab-domain summary .count{font-weight:400;color:var(--ink-faint);text-transform:none;letter-spacing:0;}
+  .vocab-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;padding:4px 12px 12px 28px;}
+  @media (max-width:520px){.vocab-grid{grid-template-columns:1fr;}}
+  .vocab-grid label{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink);font-weight:400;text-transform:none;letter-spacing:0;}
+  .vocab-grid input{width:auto;}
 
-  .ticket-head{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-size:11.5px;color:var(--ink-soft);border-bottom:1px dashed var(--line-soft);background:rgba(16,42,87,.02);}
-  .ticket-head .no{color:var(--navy);font-weight:700;}
-  .ticket-body{padding:14px;}
-  .ticket-body h3{margin:0 0 6px;font-size:16px;font-weight:700;color:var(--navy);letter-spacing:.01em;}
-  .ticket-body p{margin:0 0 10px;font-size:13.5px;line-height:1.6;color:var(--ink-soft);}
-  .outcome{font-size:13px;color:var(--ink);background:var(--paper);border-radius:var(--radius-sm);padding:9px 11px;margin-bottom:10px;}
-  .outcome b{font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-soft);font-weight:700;display:block;margin-bottom:3px;}
-  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
-  .tag{font-size:11px;background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:3px 9px;color:var(--ink-soft);}
-  .cat-badge{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;text-transform:uppercase;padding:4px 10px 4px 8px;border-radius:20px;letter-spacing:0.05em;}
-  .cat-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;}
-  .cat-badge.cat-inspection{background:var(--navy-bg);color:var(--navy);}
-  .cat-badge.cat-repair{background:var(--maroon-bg);color:var(--maroon);}
-  .cat-badge.cat-osdualboot{background:var(--gold-bg);color:var(--gold-ink);}
-  .cat-badge.cat-maintenance{background:var(--plum-bg);color:var(--plum);}
-  .cat-badge.cat-other{background:var(--grey-bg);color:var(--ink-soft);}
-  .stamp{font-size:9.5px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border:1.5px solid;border-radius:var(--radius-sm);padding:2px 7px;transform:rotate(-3deg);}
-  .stamp.pub{color:var(--gold-ink);border-color:var(--gold);}
-  .stamp.priv{color:var(--ink-faint);border-color:var(--ink-faint);}
-  .ticket-actions{display:flex;gap:8px;padding:0 14px 14px;}
+  .thumb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin:var(--space-3) 0;}
+  .thumb{border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;background:var(--paper);}
+  .thumb img{width:100%;height:90px;object-fit:cover;display:block;}
+  .thumb-feature{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--ink-soft);padding:6px 8px 0;}
+  .thumb-feature input{width:auto;}
+  .thumb-remove{width:100%;font-family:var(--serif);font-size:10.5px;background:none;border:none;border-top:1px dashed var(--line);color:var(--red);padding:6px;cursor:pointer;margin-top:6px;}
+  .thumb-remove:hover{background:var(--maroon-bg);}
+
+  .ticket-actions{display:flex;gap:8px;padding:0 14px 14px;flex-wrap:wrap;}
   .ticket-actions button{font-family:var(--serif);font-size:10.5px;font-weight:700;background:none;border:1px solid var(--line);border-radius:var(--radius-sm);padding:5px 10px;cursor:pointer;color:var(--ink-soft);transition:border-color 160ms var(--ease), color 160ms var(--ease);}
   .ticket-actions button:hover{border-color:var(--navy);color:var(--navy);}
   .ticket-actions button.danger:hover{border-color:var(--red);color:var(--red);}
-  .empty, .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:64px 20px;color:var(--ink-faint);font-size:13.5px;border:1px dashed var(--line);border-radius:var(--radius);}
-  .spinner{width:20px;height:20px;border:2px solid var(--line);border-top-color:var(--navy);border-radius:50%;animation:spin 800ms linear infinite;}
-  @keyframes spin{to{transform:rotate(360deg);}}
 </style>
 </head>
 <body>
@@ -119,7 +61,7 @@
   <div class="wrap row">
     <div class="masthead-left">
       <img class="mark" src="assets/logo-icon.png" alt="Get-IT">
-      <h1>Service log admin</h1>
+      <h1>Case study admin</h1>
     </div>
     <div id="headerRight" class="count"></div>
   </div>
@@ -130,22 +72,9 @@
 </main>
 
 <script>
-// ---- FILL THESE IN from Supabase > Project Settings > API ----
-const SUPABASE_URL = 'https://kpqzclezbehygltnqfat.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwcXpjbGV6YmVoeWdsdG5xZmF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1MzU3MDcsImV4cCI6MjEwMjExMTcwN30.aHSEUkOQBfKEaf0ZqgRKZii7FSB-IgVYtOCkbQk3GRA';
-// ----------------------------------------------------------------
-
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const CATS = ['Inspection','Repair','OS / dual-boot','Maintenance','Other'];
-const catClass = c => 'cat-' + c.toLowerCase().replace(/[^a-z]/g,'');
-
 let entries = [];
 let editingId = null;
 let formOpen = false;
-
-function escapeHtml(s){ return (s||'').replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
-function fmtDate(d){ return new Date(d+'T00:00:00').toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'}); }
-function ticketNo(n){ return '#' + String(n).padStart(4,'0'); }
 
 async function checkSession(){
   const { data:{ session } } = await sb.auth.getSession();
@@ -181,12 +110,21 @@ async function renderApp(){
 
   document.getElementById('app').innerHTML = `
     <div class="toolbar">
-      <input type="text" class="search-input" id="search" placeholder="Search title, notes, tags...">
+      <input type="text" class="search-input" id="search" placeholder="Search title, notes, tags, device...">
       <select id="filterCat">
         <option value="">All categories</option>
-        ${CATS.map(c=>`<option value="${c}">${c}</option>`).join('')}
+        ${CATEGORIES.map(c=>`<option value="${c}">${c}</option>`).join('')}
       </select>
-      <button class="plain" id="btnNew">+ New entry</button>
+      <select id="filterClient">
+        <option value="">All client types</option>
+        ${CLIENT_TYPES.map(c=>`<option value="${c}">${c}</option>`).join('')}
+      </select>
+      <select id="filterStatus">
+        <option value="">All statuses</option>
+        <option value="published">Published</option>
+        <option value="draft">Draft</option>
+      </select>
+      <button class="plain" id="btnNew">+ New case study</button>
     </div>
     <div id="formSlot"></div>
     <div id="listSlot" class="loading"><div class="spinner"></div>Loading entries...</div>
@@ -195,6 +133,8 @@ async function renderApp(){
   document.getElementById('btnNew').onclick = ()=>{ editingId=null; formOpen=true; renderForm(); window.scrollTo({top:0, behavior:'smooth'}); };
   document.getElementById('search').oninput = renderList;
   document.getElementById('filterCat').onchange = renderList;
+  document.getElementById('filterClient').onchange = renderList;
+  document.getElementById('filterStatus').onchange = renderList;
 
   await loadEntries();
 }
@@ -209,87 +149,228 @@ async function loadEntries(){
   renderList();
 }
 
+function renderVocabBlock(fieldName, selected){
+  selected = selected || [];
+  return Object.entries(VOCAB_DOMAINS).map(([domain, keys])=>{
+    const selectedCount = keys.filter(k=>selected.includes(k)).length;
+    return `
+      <details class="vocab-domain" ${selectedCount ? 'open' : ''}>
+        <summary>${escapeHtml(domain)} <span class="count">${selectedCount ? '('+selectedCount+' selected)' : ''}</span></summary>
+        <div class="vocab-grid">
+          ${keys.map(k=>`<label><input type="checkbox" data-field="${fieldName}" value="${k}" ${selected.includes(k)?'checked':''}> ${escapeHtml(vocabLabel(k))}</label>`).join('')}
+        </div>
+      </details>`;
+  }).join('');
+}
+
+function getVocabValues(fieldName){
+  return Array.from(document.querySelectorAll(`input[type=checkbox][data-field="${fieldName}"]:checked`)).map(el=>el.value);
+}
+
+function thumbHtml(path, isFeatured){
+  return `
+    <div class="thumb">
+      <img src="${storageUrl(path)}" alt="">
+      <label class="thumb-feature"><input type="radio" name="featured-image" value="${escapeHtml(path)}" ${isFeatured?'checked':''}> Featured</label>
+      <button type="button" class="thumb-remove" data-path="${escapeHtml(path)}">Remove</button>
+    </div>`;
+}
+
 function renderForm(){
   const slot = document.getElementById('formSlot');
   if(!formOpen){ slot.innerHTML=''; return; }
 
   const editing = editingId ? entries.find(e=>e.id===editingId) : null;
   const title = editing ? editing.title : '';
+  const slug = editing ? editing.slug : '';
+  const category = editing ? editing.category : CATEGORIES[0];
+  const clientType = editing ? editing.client_type : CLIENT_TYPES[0];
+  const manufacturer = editing ? (editing.device_manufacturer||'') : '';
+  const model = editing ? (editing.device_model||'') : '';
   const date = editing ? editing.date : new Date().toISOString().slice(0,10);
-  const category = editing ? editing.category : 'Inspection';
-  const description = editing ? editing.description : '';
-  const outcome = editing ? editing.outcome : '';
+  const problem = editing ? (editing.problem||'') : '';
+  const workPerformed = editing ? (editing.work_performed||'') : '';
+  const outcome = editing ? (editing.outcome||'') : '';
+  const recommendation = editing ? (editing.recommendation||'') : '';
   const tags = editing ? (editing.tags||[]).join(', ') : '';
-  const isPublic = editing ? editing.is_public : false;
+  const featured = editing ? editing.featured : false;
+  const published = editing ? editing.published : false;
 
   slot.innerHTML = `
     <div class="entry-form">
+      <h3 class="form-section-title">Details</h3>
       <div class="grid2">
-        <div class="field"><label>Project title</label><input type="text" id="f-title" value="${escapeHtml(title)}" placeholder="e.g. RTX 3050 laptop inspection - Njoroge"></div>
-        <div class="field"><label>Date</label><input type="text" id="f-date" value="${date}" placeholder="YYYY-MM-DD"></div>
+        <div class="field"><label>Title</label><input type="text" id="f-title" value="${escapeHtml(title)}" placeholder="e.g. Dell Precision 5540 workstation evaluation"></div>
+        <div class="field"><label>Slug</label><input type="text" id="f-slug" value="${escapeHtml(slug)}" placeholder="auto-generated from title"><div class="field-hint">Used in the case study URL. Leave blank to auto-generate from the title.</div></div>
       </div>
       <div class="grid2">
         <div class="field"><label>Category</label>
-          <select id="f-category">${CATS.map(c=>`<option value="${c}" ${c===category?'selected':''}>${c}</option>`).join('')}</select>
+          <select id="f-category">${CATEGORIES.map(c=>`<option value="${c}" ${c===category?'selected':''}>${c}</option>`).join('')}</select>
         </div>
-        <div class="field"><label>Tags (comma separated)</label><input type="text" id="f-tags" value="${escapeHtml(tags)}" placeholder="e.g. RTX3050, ArchiCAD, Nairobi"></div>
+        <div class="field"><label>Client type</label>
+          <select id="f-client-type">${CLIENT_TYPES.map(c=>`<option value="${c}" ${c===clientType?'selected':''}>${c}</option>`).join('')}</select>
+        </div>
       </div>
-      <div class="field"><label>What was the job</label><textarea id="f-desc">${escapeHtml(description)}</textarea></div>
-      <div class="field"><label>Outcome / result</label><textarea id="f-outcome">${escapeHtml(outcome)}</textarea></div>
+      <div class="grid2">
+        <div class="field"><label>Device manufacturer</label><input type="text" id="f-manufacturer" value="${escapeHtml(manufacturer)}" placeholder="e.g. Dell"></div>
+        <div class="field"><label>Device model</label><input type="text" id="f-model" value="${escapeHtml(model)}" placeholder="e.g. Precision 5540"></div>
+      </div>
+      <div class="field"><label>Date</label><input type="date" id="f-date" value="${date}"></div>
+      <div class="field"><label>Problem</label><textarea id="f-problem">${escapeHtml(problem)}</textarea></div>
+      <div class="field"><label>Work performed</label><textarea id="f-work">${escapeHtml(workPerformed)}</textarea></div>
+      <div class="field"><label>Outcome</label><textarea id="f-outcome">${escapeHtml(outcome)}</textarea></div>
+      <div class="field"><label>Recommendation</label><textarea id="f-recommendation">${escapeHtml(recommendation)}</textarea></div>
+      <div class="field"><label>Tags (comma separated)</label><input type="text" id="f-tags" value="${escapeHtml(tags)}" placeholder="e.g. RTX3050, ArchiCAD, thermal"></div>
+
+      <h3 class="form-section-title">Evaluation checklist</h3>
+      <div class="field"><div id="vocab-checklist">${renderVocabBlock('checklist', editing?.checklist)}</div></div>
+
+      <h3 class="form-section-title">Related framework topics</h3>
+      <div class="field"><div id="vocab-framework">${renderVocabBlock('framework_topics', editing?.framework_topics)}</div></div>
+
+      <div class="check-row" style="margin-top:var(--space-4);">
+        <label class="public-check"><input type="checkbox" id="f-featured" ${featured?'checked':''}> Featured on homepage</label>
+        <label class="public-check"><input type="checkbox" id="f-published" ${published?'checked':''}> Published (visible publicly)</label>
+      </div>
+
       <div class="form-actions">
-        <label class="public-check"><input type="checkbox" id="f-public" ${isPublic?'checked':''}> Mark shareable (visible on public portfolio)</label>
-        <div style="display:flex;gap:8px;">
-          <button class="ghost" id="f-cancel">Cancel</button>
-          <button class="plain" id="f-save">${editing?'Save changes':'Add entry'}</button>
-        </div>
+        <button class="ghost" id="f-cancel">Cancel</button>
+        <button class="plain" id="f-save">${editingId ? 'Save changes' : 'Save & continue'}</button>
       </div>
+
+      ${editing ? `
+        <h3 class="form-section-title">Images</h3>
+        <div class="field">
+          <input type="file" id="f-images" multiple accept="image/*">
+          <div class="field-hint">Uploads immediately. Pick one image below as the featured image for cards and the archive.</div>
+        </div>
+        <div class="thumb-grid" id="thumb-grid">${(editing.images||[]).map(p=>thumbHtml(p, p===editing.featured_image)).join('')}</div>
+        <div class="form-actions" style="justify-content:flex-end;">
+          <button class="plain" id="f-done">Done</button>
+        </div>
+      ` : ''}
     </div>
   `;
 
   document.getElementById('f-cancel').onclick = ()=>{ formOpen=false; editingId=null; renderForm(); };
-  document.getElementById('f-save').onclick = saveEntry;
+  document.getElementById('f-save').onclick = saveDetails;
+
+  if(editing){
+    document.getElementById('f-images').onchange = (e)=> handleImageUpload(e.target.files);
+    document.querySelectorAll('.thumb-remove').forEach(btn=>{
+      btn.onclick = ()=> removeImage(btn.dataset.path);
+    });
+    document.querySelectorAll('input[name="featured-image"]').forEach(radio=>{
+      radio.onchange = ()=> setFeaturedImage(radio.value);
+    });
+    document.getElementById('f-done').onclick = ()=>{ formOpen=false; editingId=null; renderForm(); };
+  }
 }
 
-async function saveEntry(){
+async function saveDetails(){
   const title = document.getElementById('f-title').value.trim();
-  const date = document.getElementById('f-date').value.trim();
+  const date = document.getElementById('f-date').value;
+  const category = document.getElementById('f-category').value;
+  const clientType = document.getElementById('f-client-type').value;
   if(!title || !date){ alert('Title and date are required.'); return; }
 
+  const baseSlug = document.getElementById('f-slug').value.trim() || slugify(title);
   const payload = {
     title,
+    category,
+    client_type: clientType,
+    device_manufacturer: document.getElementById('f-manufacturer').value.trim() || null,
+    device_model: document.getElementById('f-model').value.trim() || null,
     date,
-    category: document.getElementById('f-category').value,
-    description: document.getElementById('f-desc').value.trim(),
-    outcome: document.getElementById('f-outcome').value.trim(),
+    problem: document.getElementById('f-problem').value.trim() || null,
+    work_performed: document.getElementById('f-work').value.trim() || null,
+    outcome: document.getElementById('f-outcome').value.trim() || null,
+    recommendation: document.getElementById('f-recommendation').value.trim() || null,
     tags: document.getElementById('f-tags').value.split(',').map(t=>t.trim()).filter(Boolean),
-    is_public: document.getElementById('f-public').checked
+    checklist: getVocabValues('checklist'),
+    framework_topics: getVocabValues('framework_topics'),
+    featured: document.getElementById('f-featured').checked,
+    published: document.getElementById('f-published').checked
   };
 
-  let error;
-  if(editingId){
-    ({ error } = await sb.from('projects').update(payload).eq('id', editingId));
-  }else{
-    ({ error } = await sb.from('projects').insert(payload));
+  const saveBtn = document.getElementById('f-save');
+  saveBtn.disabled = true;
+  let savedRow = null;
+  for(let attempt = 0; attempt < 8; attempt++){
+    const trySlug = attempt === 0 ? baseSlug : `${baseSlug}-${attempt+1}`;
+    const res = editingId
+      ? await sb.from('projects').update({ ...payload, slug: trySlug }).eq('id', editingId).select().single()
+      : await sb.from('projects').insert({ ...payload, slug: trySlug }).select().single();
+    if(!res.error){ savedRow = res.data; break; }
+    if(res.error.code !== '23505'){ alert('Save failed: ' + res.error.message); saveBtn.disabled = false; return; }
   }
-  if(error){ alert('Save failed: ' + error.message); return; }
+  if(!savedRow){ alert('Could not save — too many slug conflicts.'); saveBtn.disabled = false; return; }
 
-  formOpen = false;
-  editingId = null;
+  editingId = savedRow.id;
   await loadEntries();
+  renderForm();
 }
 
 function editEntry(id){ editingId=id; formOpen=true; renderForm(); window.scrollTo({top:0, behavior:'smooth'}); }
 
+function sanitizeFilename(name){ return name.replace(/[^a-zA-Z0-9.\-]/g,'_'); }
+
+async function handleImageUpload(fileList){
+  const editing = entries.find(e=>e.id===editingId);
+  if(!editing) return;
+  for(const file of Array.from(fileList)){
+    const path = `${editing.slug}/${crypto.randomUUID()}-${sanitizeFilename(file.name)}`;
+    const { error: upErr } = await sb.storage.from('case-studies').upload(path, file);
+    if(upErr){ alert('Upload failed: ' + upErr.message); continue; }
+    editing.images = [...(editing.images||[]), path];
+    if(!editing.featured_image) editing.featured_image = path;
+    const { error: updErr } = await sb.from('projects').update({ images: editing.images, featured_image: editing.featured_image }).eq('id', editingId);
+    if(updErr) alert('Could not save image reference: ' + updErr.message);
+  }
+  renderForm();
+}
+
+async function removeImage(path){
+  if(!confirm('Remove this image?')) return;
+  const editing = entries.find(e=>e.id===editingId);
+  if(!editing) return;
+  await sb.storage.from('case-studies').remove([path]);
+  editing.images = (editing.images||[]).filter(p=>p!==path);
+  if(editing.featured_image === path) editing.featured_image = editing.images[0] || null;
+  const { error } = await sb.from('projects').update({ images: editing.images, featured_image: editing.featured_image }).eq('id', editingId);
+  if(error) alert('Update failed: ' + error.message);
+  renderForm();
+}
+
+async function setFeaturedImage(path){
+  const editing = entries.find(e=>e.id===editingId);
+  if(!editing) return;
+  editing.featured_image = path;
+  const { error } = await sb.from('projects').update({ featured_image: path }).eq('id', editingId);
+  if(error) alert('Update failed: ' + error.message);
+}
+
 async function deleteEntry(id){
-  if(!confirm('Delete this entry?')) return;
+  if(!confirm('Delete this case study? This also removes its uploaded images.')) return;
+  const e = entries.find(x=>x.id===id);
+  if(e && e.images && e.images.length){
+    await sb.storage.from('case-studies').remove(e.images);
+  }
   const { error } = await sb.from('projects').delete().eq('id', id);
   if(error){ alert('Delete failed: ' + error.message); return; }
   await loadEntries();
 }
 
-async function togglePublic(id){
-  const e = entries.find(e=>e.id===id);
-  const { error } = await sb.from('projects').update({ is_public: !e.is_public }).eq('id', id);
+async function toggleFeatured(id){
+  const e = entries.find(x=>x.id===id);
+  const { error } = await sb.from('projects').update({ featured: !e.featured }).eq('id', id);
+  if(error){ alert('Update failed: ' + error.message); return; }
+  await loadEntries();
+}
+
+async function togglePublished(id){
+  const e = entries.find(x=>x.id===id);
+  const { error } = await sb.from('projects').update({ published: !e.published }).eq('id', id);
   if(error){ alert('Update failed: ' + error.message); return; }
   await loadEntries();
 }
@@ -298,14 +379,21 @@ function renderList(){
   const slot = document.getElementById('listSlot');
   const search = document.getElementById('search').value.toLowerCase();
   const filterCat = document.getElementById('filterCat').value;
+  const filterClient = document.getElementById('filterClient').value;
+  const filterStatus = document.getElementById('filterStatus').value;
 
   let list = [...entries];
   if(filterCat) list = list.filter(e=>e.category===filterCat);
+  if(filterClient) list = list.filter(e=>e.client_type===filterClient);
+  if(filterStatus === 'published') list = list.filter(e=>e.published);
+  if(filterStatus === 'draft') list = list.filter(e=>!e.published);
   if(search){
     list = list.filter(e =>
       e.title.toLowerCase().includes(search) ||
-      (e.description||'').toLowerCase().includes(search) ||
-      (e.outcome||'').toLowerCase().includes(search) ||
+      (e.problem||'').toLowerCase().includes(search) ||
+      (e.work_performed||'').toLowerCase().includes(search) ||
+      (e.device_manufacturer||'').toLowerCase().includes(search) ||
+      (e.device_model||'').toLowerCase().includes(search) ||
       (e.tags||[]).some(t=>t.toLowerCase().includes(search))
     );
   }
@@ -320,18 +408,22 @@ function renderList(){
       <div class="ticket-head">
         <span class="no">${ticketNo(e.ticket_no)}</span>
         <span>${fmtDate(e.date)}</span>
-        <span class="stamp ${e.is_public?'pub':'priv'}">${e.is_public?'shareable':'private'}</span>
+        <span style="display:flex;gap:6px;">
+          ${e.featured ? `<span class="stamp star">featured</span>` : ''}
+          <span class="stamp ${e.published?'pub':'priv'}">${e.published?'published':'draft'}</span>
+        </span>
       </div>
       <div class="ticket-body">
         <span class="cat-badge ${catClass(e.category)}">${escapeHtml(e.category)}</span>
         <h3 style="margin-top:8px;">${escapeHtml(e.title)}</h3>
-        ${e.description ? `<p>${escapeHtml(e.description)}</p>` : ''}
-        ${e.outcome ? `<div class="outcome"><b>Outcome</b>${escapeHtml(e.outcome)}</div>` : ''}
+        <p>${escapeHtml(e.client_type)}${(e.device_manufacturer||e.device_model) ? ' · ' + escapeHtml([e.device_manufacturer,e.device_model].filter(Boolean).join(' ')) : ''}</p>
+        ${e.problem ? `<div class="outcome"><b>Problem</b>${escapeHtml(e.problem)}</div>` : ''}
         ${(e.tags && e.tags.length) ? `<div class="tags">${e.tags.map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
       </div>
       <div class="ticket-actions">
         <button onclick="editEntry('${e.id}')">Edit</button>
-        <button onclick="togglePublic('${e.id}')">${e.is_public?'Make private':'Mark shareable'}</button>
+        <button onclick="toggleFeatured('${e.id}')">${e.featured?'Unfeature':'Feature'}</button>
+        <button onclick="togglePublished('${e.id}')">${e.published?'Unpublish':'Publish'}</button>
         <button class="danger" onclick="deleteEntry('${e.id}')">Delete</button>
       </div>
     </div>
