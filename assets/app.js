@@ -22,7 +22,7 @@ function storageUrl(path){
   return sb.storage.from('case-studies').getPublicUrl(path).data.publicUrl;
 }
 
-const CATEGORIES = ['Inspection', 'Repair', 'Workstation Evaluation', 'Enterprise', 'Maintenance'];
+const CATEGORIES = ['Inspection', 'Repair', 'Workstation Evaluation', 'Enterprise', 'Maintenance', 'PC Sourcing'];
 const CLIENT_TYPES = ['Student', 'Architect', 'Interior Designer', 'Small Business', 'Individual'];
 
 const VOCAB_DOMAINS = {
