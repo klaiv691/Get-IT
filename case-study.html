@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Study · Get-IT</title>
+<link rel="icon" type="image/png" href="assets/logo-icon.png">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/app.js"></script>
+</head>
+<body>
+<div class="masthead">
+  <div class="wrap row">
+    <div class="masthead-left">
+      <img class="mark" src="assets/logo-icon.png" alt="Get-IT">
+      <div class="masthead-titles">
+        <h2>Get-IT</h2>
+        <p>Twesige Marvin Clive · Enterprise IT, Cloud &amp; Cybersecurity Services</p>
+      </div>
+    </div>
+    <nav class="site-nav">
+      <a href="index.html">Home</a>
+      <a href="case-studies.html" class="active">Case Studies</a>
+      <a href="framework.html">Framework</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
+</div>
+<div class="hairline"></div>
+<div class="hero">
+  <div class="wrap" id="caseHero">
+    <div class="loading"><div class="spinner"></div>Loading case study...</div>
+  </div>
+</div>
+<main class="wrap" id="caseBody"></main>
+<div class="wrap">
+  <div class="footnote">Get-IT · Twesige Marvin Clive · Kampala, Uganda · <a href="admin.html" class="admin-link">Admin login</a></div>
+</div>
+
+<script>
+const slug = new URLSearchParams(location.search).get('slug');
+
+function prose(title, inner){
+  return `<div class="prose-section"><h2>${escapeHtml(title)}</h2>${inner}</div>`;
+}
+
+function showNotFound(){
+  document.getElementById('caseHero').innerHTML = `
+    <div class="hero-inner"><div><p class="kicker">Case Study</p><h1>Not found</h1></div></div>`;
+  document.getElementById('caseBody').innerHTML = `
+    <div class="empty">
+      That case study isn't available.
+      <a href="case-studies.html" class="admin-link" style="margin-top:4px;">← Back to case studies</a>
+    </div>`;
+}
+
+function renderHero(entry){
+  document.getElementById('caseHero').innerHTML = `
+    <div class="hero-inner">
+      <div>
+        <p class="kicker">${escapeHtml(entry.category)}</p>
+        <h1>${escapeHtml(entry.title)}</h1>
+        <div class="meta-row">
+          <span class="chip">${fmtDate(entry.date)}</span>
+          <span class="cat-badge ${catClass(entry.category)}">${escapeHtml(entry.category)}</span>
+          <span class="chip">${escapeHtml(entry.client_type)}</span>
+          ${(entry.device_manufacturer || entry.device_model) ? `<span class="chip">${escapeHtml([entry.device_manufacturer, entry.device_model].filter(Boolean).join(' '))}</span>` : ''}
+        </div>
+      </div>
+      <div class="count">${ticketNo(entry.ticket_no)}</div>
+    </div>`;
+}
+
+function renderBody(entry){
+  let html = '';
+
+  if(entry.problem) html += prose('The Problem', `<p>${escapeHtml(entry.problem)}</p>`);
+
+  if(entry.checklist && entry.checklist.length){
+    const groups = groupChecklistByDomain(entry.checklist);
+    html += prose('What We Checked', groups.map(g => `
+      <div class="checklist-domain">
+        <span class="domain-label">${escapeHtml(g.domain)}</span>
+        <div class="tags">${g.items.map(k => `<span class="tag">${escapeHtml(vocabLabel(k))}</span>`).join('')}</div>
+      </div>`).join(''));
+  }
+
+  if(entry.work_performed) html += prose('Work Performed', `<p>${escapeHtml(entry.work_performed)}</p>`);
+  if(entry.outcome) html += prose('Outcome', `<div class="outcome">${escapeHtml(entry.outcome)}</div>`);
+  if(entry.recommendation) html += `<div class="prose-section recommendation"><h2>Recommendation</h2><p>${escapeHtml(entry.recommendation)}</p></div>`;
+
+  if(entry.framework_topics && entry.framework_topics.length){
+    html += prose('Related Framework Topics', `<div class="tags">${entry.framework_topics.map(t => `<a href="framework.html#modules" class="tag" style="text-decoration:none;">${escapeHtml(vocabLabel(t))}</a>`).join('')}</div>`);
+  }
+
+  if(entry.images && entry.images.length){
+    html += prose('Gallery', `<div class="gallery-grid">${entry.images.map(p => `<a href="${storageUrl(p)}" target="_blank" rel="noopener"><img loading="lazy" src="${storageUrl(p)}" alt=""></a>`).join('')}</div>`);
+  }
+
+  html += `<div id="similarSlot"></div>`;
+  document.getElementById('caseBody').innerHTML = html;
+}
+
+async function loadSimilar(entry){
+  const { data: all } = await sb.from('projects')
+    .select('id,slug,title,ticket_no,category,client_type,framework_topics,date,featured_image,problem,outcome,tags')
+    .eq('published', true);
+  if(!all) return;
+  const similar = scoreSimilar(entry, all, 3);
+  const slot = document.getElementById('similarSlot');
+  if(!slot || !similar.length) return;
+  slot.outerHTML = `
+    <div class="prose-section">
+      <h2>Similar Case Studies</h2>
+      <div class="grid">${similar.map((e,i) => ticketCardHtml(e,i)).join('')}</div>
+    </div>`;
+}
+
+async function load(){
+  if(!slug){ showNotFound(); return; }
+  const { data: entry, error } = await sb.from('projects').select('*').eq('slug', slug).eq('published', true).single();
+  if(error || !entry){ showNotFound(); return; }
+  document.title = entry.title + ' · Get-IT';
+  renderHero(entry);
+  renderBody(entry);
+  loadSimilar(entry);
+}
+
+load();
+</script>
+</body>
+</html>

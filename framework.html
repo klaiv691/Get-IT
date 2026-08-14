@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Get-IT Assessment Framework</title>
+<link rel="icon" type="image/png" href="assets/logo-icon.png">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/app.js"></script>
+</head>
+<body>
+<div class="masthead">
+  <div class="wrap row">
+    <div class="masthead-left">
+      <img class="mark" src="assets/logo-icon.png" alt="Get-IT">
+      <div class="masthead-titles">
+        <h2>Get-IT</h2>
+        <p>Twesige Marvin Clive · Enterprise IT, Cloud &amp; Cybersecurity Services</p>
+      </div>
+    </div>
+    <nav class="site-nav">
+      <a href="index.html">Home</a>
+      <a href="case-studies.html">Case Studies</a>
+      <a href="framework.html" class="active">Framework</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
+</div>
+<div class="hairline"></div>
+<div class="hero">
+  <div class="wrap hero-inner">
+    <div>
+      <p class="kicker">How We Think</p>
+      <h1>The Get-IT Assessment Framework</h1>
+    </div>
+  </div>
+</div>
+<main class="wrap">
+  <div class="prose-section">
+    <h2>Introduction</h2>
+    <p>Every job that comes through Get-IT — a laptop inspection or a multi-system business IT project — goes through the same process: understand what you actually need, assess the technology against that need, recommend the option that fits, and implement it properly. This page describes that process in more detail than the homepage does. The specific checks and service modules below are still being written up as they're formalized from real work — but every case study on this site is already an example of the framework in practice, even before every section here is filled in.</p>
+  </div>
+
+  <div class="prose-section">
+    <h2>The Four Steps</h2>
+    <div class="module-grid" id="coreGrid">
+      <div class="loading"><div class="spinner"></div>Loading...</div>
+    </div>
+  </div>
+
+  <div class="prose-section" id="modules">
+    <h2>Service-Specific Assessment Modules</h2>
+    <div class="module-grid" id="moduleGrid">
+      <div class="loading"><div class="spinner"></div>Loading...</div>
+    </div>
+  </div>
+
+  <div class="footnote">Get-IT · Twesige Marvin Clive · Kampala, Uganda · <a href="admin.html" class="admin-link">Admin login</a></div>
+</main>
+
+<script>
+const CORE_STEPS = [
+  { key: 'understand', title: 'Understand' },
+  { key: 'assess', title: 'Assess' },
+  { key: 'recommend', title: 'Recommend' },
+  { key: 'implement', title: 'Implement' }
+];
+
+function renderCore(coreRows){
+  document.getElementById('coreGrid').innerHTML = CORE_STEPS.map((step, i) => {
+    const row = coreRows.find(r => r.section_key === step.key);
+    const title = (row && row.title) || step.title;
+    const body = row && row.body;
+    return `
+      <div class="framework-step">
+        <span class="step-no">${i+1}</span>
+        <h3>${escapeHtml(title)}</h3>
+        ${body ? `<p>${escapeHtml(body)}</p>` : `<p class="placeholder">Content for this section is being developed.</p>`}
+      </div>`;
+  }).join('');
+}
+
+async function renderModules(moduleRows){
+  const grid = document.getElementById('moduleGrid');
+
+  if(!moduleRows.length){
+    grid.innerHTML = `
+      <div class="module-card" style="grid-column:1/-1;">
+        <p class="placeholder">Content for this section is being developed. Modules for each service line — laptop inspections, workstation evaluations, Microsoft 365, networks, and more — will appear here as they're written up.</p>
+      </div>`;
+    return;
+  }
+
+  const { data: all } = await sb.from('projects')
+    .select('id,slug,title,ticket_no,category,client_type,framework_topics,date,featured_image')
+    .eq('published', true);
+
+  grid.innerHTML = moduleRows.map(row => {
+    const related = (all || []).filter(e => (e.framework_topics||[]).includes(row.section_key)).slice(0, 3);
+    return `
+      <div class="module-card">
+        <h3>${escapeHtml(row.title)}</h3>
+        ${row.body ? `<p>${escapeHtml(row.body)}</p>` : `<p class="placeholder">Content for this section is being developed.</p>`}
+        ${related.length ? `<div class="module-related">${related.map(e => `<a href="case-study.html?slug=${encodeURIComponent(e.slug)}">${escapeHtml(e.title)}</a>`).join('')}</div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+async function load(){
+  const { data: sections, error } = await sb.from('framework_sections').select('*').eq('published', true).order('sort_order');
+  const rows = error ? [] : (sections || []);
+  renderCore(rows.filter(s => s.section_type === 'core'));
+  await renderModules(rows.filter(s => s.section_type === 'module'));
+}
+
+load();
+</script>
+</body>
+</html>

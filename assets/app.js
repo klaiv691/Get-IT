@@ -47,3 +47,55 @@ const VOCAB_LABELS = {
 function vocabLabel(key){
   return VOCAB_LABELS[key] || key.replace(/_/g,' ').replace(/\b\w/g, c => c.toUpperCase());
 }
+
+// Public-facing case study card, linking to the detail page. Used on the
+// homepage (featured), the archive, similar-case-study lists, and
+// framework module "related case studies" lists.
+function ticketCardHtml(e, i){
+  return `
+    <a class="ticket ${catClass(e.category)}" style="--i:${i||0}" href="case-study.html?slug=${encodeURIComponent(e.slug)}">
+      ${e.featured_image ? `<img class="ticket-image" src="${storageUrl(e.featured_image)}" alt="">` : ''}
+      <div class="ticket-head">
+        <span class="no">${ticketNo(e.ticket_no)}</span>
+        <span>${fmtDate(e.date)}</span>
+      </div>
+      <div class="ticket-body">
+        <span class="cat-badge ${catClass(e.category)}">${escapeHtml(e.category)}</span>
+        <h3 style="margin-top:8px;">${escapeHtml(e.title)}</h3>
+        ${e.problem ? `<p>${escapeHtml(e.problem)}</p>` : ''}
+        ${e.outcome ? `<div class="outcome"><b>Outcome</b>${escapeHtml(e.outcome)}</div>` : ''}
+        ${(e.tags && e.tags.length) ? `<div class="tags">${e.tags.map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+      </div>
+    </a>`;
+}
+
+// Groups a flat checklist/framework_topics array back into its VOCAB_DOMAINS
+// structure, keeping only domains with at least one selected item.
+function groupChecklistByDomain(keys){
+  keys = keys || [];
+  return Object.entries(VOCAB_DOMAINS)
+    .map(([domain, domainKeys]) => ({ domain, items: domainKeys.filter(k => keys.includes(k)) }))
+    .filter(g => g.items.length > 0);
+}
+
+// Scores candidate case studies against the current one: +1 for a matching
+// category, +1 per overlapping framework_topics tag. Returns the top `limit`.
+function scoreSimilar(current, candidates, limit){
+  limit = limit || 3;
+  const topics = current.framework_topics || [];
+  return candidates
+    .filter(c => c.id !== current.id)
+    .map(c => {
+      let score = (c.category === current.category) ? 1 : 0;
+      score += (c.framework_topics || []).filter(t => topics.includes(t)).length;
+      return { entry: c, score };
+    })
+    .filter(x => x.score > 0)
+    .sort((a, b) => b.score - a.score || new Date(b.entry.date) - new Date(a.entry.date))
+    .slice(0, limit)
+    .map(x => x.entry);
+}
+
+function waLink(digits, message){
+  return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
+}

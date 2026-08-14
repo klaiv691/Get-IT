@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact · Get-IT</title>
+<link rel="icon" type="image/png" href="assets/logo-icon.png">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/app.js"></script>
+</head>
+<body>
+<div class="masthead">
+  <div class="wrap row">
+    <div class="masthead-left">
+      <img class="mark" src="assets/logo-icon.png" alt="Get-IT">
+      <div class="masthead-titles">
+        <h2>Get-IT</h2>
+        <p>Twesige Marvin Clive · Enterprise IT, Cloud &amp; Cybersecurity Services</p>
+      </div>
+    </div>
+    <nav class="site-nav">
+      <a href="index.html">Home</a>
+      <a href="case-studies.html">Case Studies</a>
+      <a href="framework.html">Framework</a>
+      <a href="contact.html" class="active">Contact</a>
+    </nav>
+  </div>
+</div>
+<div class="hairline"></div>
+<div class="hero">
+  <div class="wrap hero-inner">
+    <div>
+      <p class="kicker">Contact</p>
+      <h1>Let's talk about your technology.</h1>
+      <p class="sub">Whether it's a laptop you're about to buy, a workstation that's slowing you down, or a business system that needs attention — here's how to reach me.</p>
+    </div>
+  </div>
+</div>
+<main class="wrap">
+
+  <div class="action-grid">
+    <div class="action-card">
+      <h3>Book a Laptop Inspection</h3>
+      <p>UGX 50,000 covers a full pre-purchase or diagnostic inspection — CPU, GPU, RAM, storage health, battery, thermals, and more — before you commit to buying or repairing a machine.</p>
+      <a class="plain" id="waBook" href="#" target="_blank" rel="noopener">Message on WhatsApp</a>
+      <span class="alt-contact">Or call / WhatsApp <a href="tel:+256785739120">+256 785 739 120</a></span>
+    </div>
+    <div class="action-card">
+      <h3>Business Enquiries</h3>
+      <p>For Microsoft 365, networking, cybersecurity, maintenance, or ERP projects, email a short description of what you're working with and what you need — I'll reply with next steps.</p>
+      <a class="plain" href="mailto:marvinclive16@gmail.com?subject=Business%20Enquiry">Email Get-IT</a>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <h3 style="margin:0 0 6px;color:var(--navy);font-size:17px;">General Questions</h3>
+    <p style="margin:0 0 16px;color:var(--ink-soft);font-size:13.5px;">Not sure which category your question falls into? Send a message below and I'll get back to you — usually within a day.</p>
+    <form id="contactForm">
+      <div class="field-row">
+        <div class="field"><label>Name</label><input type="text" id="f-name" required></div>
+        <div class="field"><label>Email</label><input type="email" id="f-email" required></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Phone</label><input type="tel" id="f-phone"></div>
+        <div class="field"><label>Service required</label>
+          <select id="f-service"></select>
+        </div>
+      </div>
+      <div class="field"><label>Message</label><textarea id="f-message" required></textarea></div>
+      <div class="field honeypot"><label>Leave blank</label><input type="text" id="f-hp" tabindex="-1" autocomplete="off"></div>
+      <button class="plain" type="submit" id="f-submit">Send message</button>
+      <div id="formResult"></div>
+    </form>
+  </div>
+
+  <div class="prose-section">
+    <h2>Service Area</h2>
+    <p>Get-IT is based in Kampala. On-site visits are available across the city for inspections, repairs, and business IT work; remote consultations and support are available for clients elsewhere in Uganda or working over email and WhatsApp.</p>
+  </div>
+
+  <div class="prose-section">
+    <h2>Hours</h2>
+    <ul class="hours-list">
+      <li><span class="day">Monday – Friday</span><span class="time">9:00 AM – 6:00 PM</span></li>
+      <li><span class="day">Saturday</span><span class="time">10:00 AM – 2:00 PM</span></li>
+      <li><span class="day">Sunday</span><span class="time">Closed</span></li>
+    </ul>
+    <p style="margin-top:12px;color:var(--ink-soft);font-size:13px;">Urgent business IT issues (network down, security incident) — message on WhatsApp any time; I respond as soon as I can outside these hours.</p>
+  </div>
+
+  <div class="footnote">Get-IT · Twesige Marvin Clive · Kampala, Uganda · <a href="admin.html" class="admin-link">Admin login</a></div>
+</main>
+
+<script>
+document.getElementById('waBook').href = waLink('256705748346', "Hi Get-IT, I'd like to book a laptop inspection (UGX 50,000). Can we arrange a time?");
+
+const serviceSelect = document.getElementById('f-service');
+serviceSelect.innerHTML = CATEGORIES.map(c=>`<option value="${c}">${c}</option>`).join('') + `<option value="Other">Other / not sure</option>`;
+
+document.getElementById('contactForm').onsubmit = async (e)=>{
+  e.preventDefault();
+  if(document.getElementById('f-hp').value){ return; } // honeypot triggered, silently drop
+
+  const submitBtn = document.getElementById('f-submit');
+  const resultEl = document.getElementById('formResult');
+  submitBtn.disabled = true;
+
+  const payload = {
+    name: document.getElementById('f-name').value.trim(),
+    email: document.getElementById('f-email').value.trim(),
+    phone: document.getElementById('f-phone').value.trim() || null,
+    service: document.getElementById('f-service').value,
+    message: document.getElementById('f-message').value.trim()
+  };
+
+  const { error } = await sb.from('contact_messages').insert(payload);
+
+  if(error){
+    resultEl.innerHTML = `<div class="form-error">Something went wrong sending your message. Please try again, or email marvinclive16@gmail.com directly.</div>`;
+    submitBtn.disabled = false;
+    return;
+  }
+
+  document.getElementById('contactForm').reset();
+  resultEl.innerHTML = `<div class="form-success">Thanks — I'll get back to you within a day.</div>`;
+  submitBtn.disabled = false;
+};
+</script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Case studies · Get-IT</title>
+<title>Get-IT · Enterprise IT, Cloud &amp; Cybersecurity Services</title>
 <link rel="icon" type="image/png" href="assets/logo-icon.png">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,73 +14,170 @@
 <body>
 <div class="masthead">
   <div class="wrap row">
-    <img class="mark" src="assets/logo-icon.png" alt="Get-IT">
-    <div class="masthead-titles">
-      <h2>Get-IT</h2>
-      <p>Twesige Marvin Clive · Enterprise IT, Cloud &amp; Cybersecurity Services</p>
+    <div class="masthead-left">
+      <img class="mark" src="assets/logo-icon.png" alt="Get-IT">
+      <div class="masthead-titles">
+        <h2>Get-IT</h2>
+        <p>Twesige Marvin Clive · Enterprise IT, Cloud &amp; Cybersecurity Services</p>
+      </div>
     </div>
+    <nav class="site-nav">
+      <a href="index.html" class="active">Home</a>
+      <a href="case-studies.html">Case Studies</a>
+      <a href="framework.html">Framework</a>
+      <a href="contact.html">Contact</a>
+    </nav>
   </div>
 </div>
 <div class="hairline"></div>
+
 <div class="hero">
-  <div class="wrap hero-inner">
-    <div>
-      <p class="kicker">Case Studies</p>
-      <h1>Project portfolio</h1>
-      <p class="sub">Selected inspections, repairs, and builds — shared by request.</p>
+  <div class="wrap">
+    <p class="kicker">Kampala, Uganda</p>
+    <h1>The technology decisions that matter, made with evidence — not guesswork.</h1>
+    <p class="sub">Get-IT inspects laptops before purchase, evaluates workstations for demanding software, and supports the Microsoft 365 systems, networks, and infrastructure behind small businesses in Kampala — every recommendation backed by a documented assessment, not a sales pitch.</p>
+    <div class="hero-actions">
+      <a class="plain" href="contact.html">Book an Inspection</a>
+      <a class="ghost-light" href="case-studies.html">View Case Studies</a>
     </div>
-    <div class="count" id="count">Loading…</div>
   </div>
 </div>
-<main class="wrap">
-  <div id="list" class="loading"><div class="spinner"></div>Loading entries...</div>
-  <div class="footnote">Selected work, shared by request. · <a href="admin.html" class="admin-link">Admin login</a></div>
-</main>
 
-<script>
-async function load(){
-  const { data, error } = await sb
-    .from('projects')
-    .select('*')
-    .eq('published', true)
-    .order('date', { ascending: false });
-
-  const listEl = document.getElementById('list');
-  const countEl = document.getElementById('count');
-
-  if(error){
-    listEl.innerHTML = `<div class="empty">Couldn't load entries. Check the Supabase URL and key are correct.</div>`;
-    countEl.textContent = '';
-    console.error(error);
-    return;
-  }
-
-  countEl.textContent = `${data.length} ${data.length===1?'entry':'entries'}`;
-
-  if(data.length === 0){
-    listEl.innerHTML = `<div class="empty">No entries published yet.</div>`;
-    return;
-  }
-
-  listEl.innerHTML = `<div class="grid">${data.map((e, i) => `
-    <div class="ticket ${catClass(e.category)}" style="--i:${i}">
-      ${e.featured_image ? `<img class="ticket-image" src="${storageUrl(e.featured_image)}" alt="">` : ''}
-      <div class="ticket-head">
-        <span class="no">${ticketNo(e.ticket_no)}</span>
-        <span>${fmtDate(e.date)}</span>
+<div class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">Services</p>
+      <h2>Three ways to work with Get-IT</h2>
+    </div>
+    <div class="grid-3">
+      <div class="pathway-card">
+        <span class="num">1</span>
+        <h3>Personal Technology</h3>
+        <p>Buying a second-hand laptop or troubleshooting the one you already own? I inspect devices before you pay for them, repair the faults that are actually worth fixing, and set up the operating system, drivers, and maintenance routine that keep a machine reliable.</p>
       </div>
-      <div class="ticket-body">
-        <span class="cat-badge ${catClass(e.category)}">${escapeHtml(e.category)}</span>
-        <h3 style="margin-top:8px;">${escapeHtml(e.title)}</h3>
-        ${e.problem ? `<p>${escapeHtml(e.problem)}</p>` : ''}
-        ${e.outcome ? `<div class="outcome"><b>Outcome</b>${escapeHtml(e.outcome)}</div>` : ''}
-        ${(e.tags && e.tags.length) ? `<div class="tags">${e.tags.map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+      <div class="pathway-card">
+        <span class="num">2</span>
+        <h3>Professional Workstations</h3>
+        <p>Architects, interior designers, and other professionals lose real hours to underpowered hardware. I evaluate workstations against the software you actually run — CAD, BIM, rendering — so a machine is judged by whether it can do the job, not by its spec sheet.</p>
+      </div>
+      <div class="pathway-card">
+        <span class="num">3</span>
+        <h3>Business IT</h3>
+        <p>Small businesses need Microsoft 365 configured properly, networks that hold up during work hours, and IT decisions grounded in what the business actually needs. I advise on and implement Microsoft 365, networking, cybersecurity basics, and ERP systems like Odoo.</p>
       </div>
     </div>
-  `).join('')}</div>`;
+  </div>
+</div>
+
+<div class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">Case Studies</p>
+      <h2 id="featuredHeading">Featured Case Studies</h2>
+    </div>
+    <div class="grid-3" id="featuredGrid">
+      <div class="loading"><div class="spinner"></div>Loading...</div>
+    </div>
+    <div style="text-align:center;margin-top:var(--space-6);">
+      <a class="ghost" href="case-studies.html">View all case studies →</a>
+    </div>
+  </div>
+</div>
+
+<div class="section section-navy">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Every recommendation starts with an assessment.</h2>
+      <p class="sub">Before I recommend anything — a repair, a replacement, a new system — I work through the same four steps: understand what you actually need, assess the technology against that need, recommend the option that fits (which isn't always the most expensive one), and implement it properly. It's the same process whether the job is a laptop inspection or a business-wide Microsoft 365 rollout.</p>
+    </div>
+    <div style="text-align:center;">
+      <a class="ghost-light" href="framework.html">Explore the Get-IT Assessment Framework →</a>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">Why Get-IT</p>
+      <h2>Independent, evidence-based, and built for the long term</h2>
+    </div>
+    <div class="diff-list">
+      <div class="diff-item">
+        <span class="dot"></span>
+        <div><h3>Independent advice</h3><p>I don't sell hardware or hold vendor partnerships, so a recommendation to repair, replace, or leave a system alone is based on what's actually best for you.</p></div>
+      </div>
+      <div class="diff-item">
+        <span class="dot"></span>
+        <div><h3>Technical confidence</h3><p>You get a plain-language explanation of what's wrong, what fixing it involves, and what to expect afterward — not just a bill.</p></div>
+      </div>
+      <div class="diff-item">
+        <span class="dot"></span>
+        <div><h3>Evidence-based recommendations</h3><p>Every case study on this site documents what was assessed, what was found, and why the resulting recommendation was made.</p></div>
+      </div>
+      <div class="diff-item">
+        <span class="dot"></span>
+        <div><h3>Enterprise experience</h3><p>The same assessment discipline used on Microsoft 365 and infrastructure projects gets applied to a single laptop inspection.</p></div>
+      </div>
+      <div class="diff-item">
+        <span class="dot"></span>
+        <div><h3>Preventive approach</h3><p>Maintenance and monitoring are built into the process, so small problems get caught before they become expensive ones.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section section-maroon">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">Enterprise</p>
+      <h2>Also built for business</h2>
+      <p class="sub">Get-IT works with small and growing businesses on the systems that run day to day — not just the laptops on people's desks.</p>
+    </div>
+    <div class="capability-chips">
+      <span class="chip">Microsoft 365 (Entra ID, Exchange, SharePoint, Intune)</span>
+      <span class="chip">Networks &amp; Connectivity (Wi-Fi, switching, routing, firewalls, VPN)</span>
+      <span class="chip">Cybersecurity (identity, MFA, backup, endpoint protection)</span>
+      <span class="chip">Business Systems (Odoo/ERP, automation, inventory)</span>
+      <span class="chip">Infrastructure (servers, virtualization, cloud, monitoring)</span>
+    </div>
+  </div>
+</div>
+
+<div class="section section-navy cta-band">
+  <div class="wrap">
+    <h2>Have a device or a system that needs a second opinion?</h2>
+    <p class="sub">Book a laptop inspection, ask a workstation question, or get in touch about business IT — I usually reply within a day.</p>
+    <a class="plain" href="contact.html">Get in Touch →</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="footnote">Get-IT · Twesige Marvin Clive · Kampala, Uganda · <a href="admin.html" class="admin-link">Admin login</a></div>
+</div>
+
+<script>
+async function loadFeatured(){
+  let heading = 'Featured Case Studies';
+  let { data, error } = await sb.from('projects').select('*').eq('published', true).eq('featured', true).order('date', { ascending: false }).limit(3);
+
+  if(!error && (!data || data.length === 0)){
+    ({ data, error } = await sb.from('projects').select('*').eq('published', true).order('date', { ascending: false }).limit(3));
+    heading = 'Recent Case Studies';
+  }
+
+  document.getElementById('featuredHeading').textContent = heading;
+  const grid = document.getElementById('featuredGrid');
+
+  if(error || !data || !data.length){
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">Case studies will appear here soon.</div>`;
+    return;
+  }
+
+  grid.innerHTML = data.map((e, i) => ticketCardHtml(e, i)).join('');
 }
 
-load();
+loadFeatured();
 </script>
 </body>
 </html>

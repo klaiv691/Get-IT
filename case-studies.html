@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Studies · Get-IT</title>
+<link rel="icon" type="image/png" href="assets/logo-icon.png">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/app.js"></script>
+</head>
+<body>
+<div class="masthead">
+  <div class="wrap row">
+    <div class="masthead-left">
+      <img class="mark" src="assets/logo-icon.png" alt="Get-IT">
+      <div class="masthead-titles">
+        <h2>Get-IT</h2>
+        <p>Twesige Marvin Clive · Enterprise IT, Cloud &amp; Cybersecurity Services</p>
+      </div>
+    </div>
+    <nav class="site-nav">
+      <a href="index.html">Home</a>
+      <a href="case-studies.html" class="active">Case Studies</a>
+      <a href="framework.html">Framework</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
+</div>
+<div class="hairline"></div>
+<div class="hero">
+  <div class="wrap hero-inner">
+    <div>
+      <p class="kicker">Case Studies</p>
+      <h1>Proof, not promises.</h1>
+      <p class="sub">Every inspection, repair, and evaluation below follows the same assessment process — searchable by category or client type.</p>
+    </div>
+    <div class="count" id="count">Loading…</div>
+  </div>
+</div>
+<main class="wrap">
+  <div class="toolbar">
+    <input type="text" class="search-input" id="search" placeholder="Search title, notes, tags, device...">
+    <select id="filterCat">
+      <option value="">All categories</option>
+    </select>
+    <select id="filterClient">
+      <option value="">All client types</option>
+    </select>
+  </div>
+  <div id="list" class="loading"><div class="spinner"></div>Loading entries...</div>
+  <div class="footnote">Get-IT · Twesige Marvin Clive · Kampala, Uganda · <a href="admin.html" class="admin-link">Admin login</a></div>
+</main>
+
+<script>
+document.getElementById('filterCat').innerHTML += CATEGORIES.map(c=>`<option value="${c}">${c}</option>`).join('');
+document.getElementById('filterClient').innerHTML += CLIENT_TYPES.map(c=>`<option value="${c}">${c}</option>`).join('');
+
+let entries = [];
+
+async function load(){
+  const { data, error } = await sb
+    .from('projects')
+    .select('*')
+    .eq('published', true)
+    .order('date', { ascending: false });
+
+  const countEl = document.getElementById('count');
+
+  if(error){
+    document.getElementById('list').innerHTML = `<div class="empty">Couldn't load entries. Check the Supabase URL and key are correct.</div>`;
+    countEl.textContent = '';
+    console.error(error);
+    return;
+  }
+
+  entries = data;
+  countEl.textContent = `${entries.length} ${entries.length===1?'entry':'entries'}`;
+  renderList();
+}
+
+function renderList(){
+  const listEl = document.getElementById('list');
+  const search = document.getElementById('search').value.toLowerCase();
+  const filterCat = document.getElementById('filterCat').value;
+  const filterClient = document.getElementById('filterClient').value;
+
+  let list = [...entries];
+  if(filterCat) list = list.filter(e=>e.category===filterCat);
+  if(filterClient) list = list.filter(e=>e.client_type===filterClient);
+  if(search){
+    list = list.filter(e =>
+      e.title.toLowerCase().includes(search) ||
+      (e.problem||'').toLowerCase().includes(search) ||
+      (e.work_performed||'').toLowerCase().includes(search) ||
+      (e.device_manufacturer||'').toLowerCase().includes(search) ||
+      (e.device_model||'').toLowerCase().includes(search) ||
+      (e.tags||[]).some(t=>t.toLowerCase().includes(search))
+    );
+  }
+
+  if(list.length === 0){
+    listEl.innerHTML = `<div class="empty">No case studies match.</div>`;
+    return;
+  }
+
+  listEl.innerHTML = `<div class="grid">${list.map((e,i)=>ticketCardHtml(e,i)).join('')}</div>`;
+}
+
+document.getElementById('search').oninput = renderList;
+document.getElementById('filterCat').onchange = renderList;
+document.getElementById('filterClient').onchange = renderList;
+
+load();
+</script>
+</body>
+</html>
