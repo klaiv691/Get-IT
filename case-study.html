@@ -89,6 +89,19 @@ function renderBody(entry){
   }
 
   if(entry.work_performed) html += prose('Work Performed', `<p>${escapeHtml(entry.work_performed)}</p>`);
+
+  if(entry.candidate_machines && entry.candidate_machines.length){
+    const statusClass = { selected: 'pub', rejected: 'priv', considered: 'navy' };
+    html += prose('Candidates Considered', `<div class="candidates-list">${entry.candidate_machines.map(c => `
+      <div class="candidate-item">
+        <div class="candidate-item-head">
+          <span class="candidate-item-name">${escapeHtml([c.manufacturer, c.model].filter(Boolean).join(' ') || 'Unnamed machine')}</span>
+          <span class="stamp ${statusClass[c.status] || 'navy'}">${escapeHtml(c.status || 'considered')}</span>
+        </div>
+        ${c.notes ? `<p class="candidate-item-notes">${escapeHtml(c.notes)}</p>` : ''}
+      </div>`).join('')}</div>`);
+  }
+
   if(entry.outcome) html += prose('Outcome', `<div class="outcome">${escapeHtml(entry.outcome)}</div>`);
   if(entry.recommendation) html += `<div class="prose-section recommendation"><h2>Recommendation</h2><p>${escapeHtml(entry.recommendation)}</p></div>`;
 

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repairs · Get-IT</title>
+<link rel="icon" type="image/png" href="assets/logo-icon.png">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/app.js"></script>
+</head>
+<body>
+<div class="masthead">
+  <div class="wrap row">
+    <a class="masthead-left" href="index.html">
+      <img class="mark" src="assets/logo-icon.png" alt="Get-IT">
+      <div class="masthead-titles">
+        <h2>Get-IT</h2>
+        <p>Twesige Marvin Clive · Enterprise IT, Cloud &amp; Cybersecurity Services</p>
+      </div>
+    </a>
+    <nav class="site-nav">
+      <a href="index.html">Home</a>
+      <a href="case-studies.html">Case Studies</a>
+      <a href="framework.html">Framework</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
+</div>
+<div class="hairline"></div>
+<div class="hero">
+  <div class="wrap hero-inner">
+    <div>
+      <p class="kicker">Services</p>
+      <h1>Repairs</h1>
+      <p class="sub">Hardware faults diagnosed and fixed properly — not guessed at. If something isn't worth repairing, that's the recommendation you'll get, not a sale.</p>
+    </div>
+  </div>
+</div>
+<main class="wrap">
+
+  <div class="prose-section" style="border-bottom:none;padding-top:0;">
+    <h2>Case Studies</h2>
+    <div id="list" class="loading"><div class="spinner"></div>Loading case studies...</div>
+  </div>
+
+  <div class="footnote">Get-IT · Twesige Marvin Clive · Kampala, Uganda · <a href="admin.html" class="admin-link">Admin login</a></div>
+</main>
+
+<script>
+async function load(){
+  const { data, error } = await sb.from('projects')
+    .select('*')
+    .eq('published', true)
+    .eq('category', 'Repair')
+    .order('date', { ascending: false });
+
+  const listEl = document.getElementById('list');
+  if(error || !data || !data.length){
+    listEl.innerHTML = `<div class="empty">No case studies published in this category yet.</div>`;
+    return;
+  }
+  listEl.innerHTML = `<div class="grid">${data.map((e, i) => ticketCardHtml(e, i)).join('')}</div>`;
+}
+load();
+</script>
+</body>
+</html>

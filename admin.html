@@ -37,6 +37,14 @@
   .vocab-grid label{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink);font-weight:400;text-transform:none;letter-spacing:0;}
   .vocab-grid input{width:auto;}
 
+  .candidate-row{display:grid;grid-template-columns:1fr 1fr 130px 1.4fr auto;gap:8px;align-items:start;margin-bottom:8px;padding-bottom:10px;border-bottom:1px dashed var(--line);}
+  @media (max-width:760px){
+    .candidate-row{grid-template-columns:1fr;margin-bottom:14px;}
+    .candidate-remove{justify-self:start;}
+  }
+  .candidate-remove{font-family:var(--serif);font-size:10.5px;font-weight:700;background:none;border:1px solid var(--line);border-radius:var(--radius-sm);padding:9px 10px;cursor:pointer;color:var(--red);white-space:nowrap;}
+  .candidate-remove:hover{background:var(--maroon-bg);}
+
   .thumb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin:var(--space-3) 0;}
   .thumb{border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;background:var(--paper);}
   .thumb img{width:100%;height:90px;object-fit:cover;display:block;}
@@ -162,6 +170,31 @@ function getVocabValues(fieldName){
   return Array.from(document.querySelectorAll(`input[type=checkbox][data-field="${fieldName}"]:checked`)).map(el=>el.value);
 }
 
+function candidateRowHtml(c){
+  c = c || { manufacturer:'', model:'', status:'considered', notes:'' };
+  return `
+    <div class="candidate-row">
+      <input type="text" class="cm-manufacturer" placeholder="Manufacturer" value="${escapeHtml(c.manufacturer)}">
+      <input type="text" class="cm-model" placeholder="Model" value="${escapeHtml(c.model)}">
+      <select class="cm-status">
+        <option value="considered" ${c.status==='considered'?'selected':''}>Considered</option>
+        <option value="selected" ${c.status==='selected'?'selected':''}>Selected</option>
+        <option value="rejected" ${c.status==='rejected'?'selected':''}>Rejected</option>
+      </select>
+      <input type="text" class="cm-notes" placeholder="Notes" value="${escapeHtml(c.notes)}">
+      <button type="button" class="candidate-remove">Remove</button>
+    </div>`;
+}
+
+function getCandidateMachines(){
+  return Array.from(document.querySelectorAll('#candidateList .candidate-row')).map(row => ({
+    manufacturer: row.querySelector('.cm-manufacturer').value.trim(),
+    model: row.querySelector('.cm-model').value.trim(),
+    status: row.querySelector('.cm-status').value,
+    notes: row.querySelector('.cm-notes').value.trim()
+  })).filter(c => c.manufacturer || c.model || c.notes);
+}
+
 function thumbHtml(path, isFeatured){
   return `
     <div class="thumb">
@@ -217,6 +250,13 @@ function renderForm(){
       <div class="field"><label>Recommendation</label><textarea id="f-recommendation">${escapeHtml(recommendation)}</textarea></div>
       <div class="field"><label>Tags (comma separated)</label><input type="text" id="f-tags" value="${escapeHtml(tags)}" placeholder="e.g. RTX3050, ArchiCAD, thermal"></div>
 
+      <div id="candidateSection" style="display:${category==='PC Sourcing'?'block':'none'};">
+        <h3 class="form-section-title">Candidate machines</h3>
+        <div class="field-hint" style="margin:-6px 0 10px;">Only relevant for PC Sourcing. Record every machine considered, not just the one selected.</div>
+        <div id="candidateList">${(editing?.candidate_machines||[]).map(candidateRowHtml).join('')}</div>
+        <button type="button" class="ghost" id="candidateAdd">+ Add machine</button>
+      </div>
+
       <h3 class="form-section-title">Evaluation checklist</h3>
       <div class="field"><div id="vocab-checklist">${renderVocabBlock('checklist', editing?.checklist)}</div></div>
 
@@ -250,6 +290,16 @@ function renderForm(){
   document.getElementById('f-cancel').onclick = ()=>{ formOpen=false; editingId=null; renderForm(); };
   document.getElementById('f-save').onclick = saveDetails;
 
+  document.getElementById('f-category').onchange = (e)=>{
+    document.getElementById('candidateSection').style.display = e.target.value === 'PC Sourcing' ? 'block' : 'none';
+  };
+  document.getElementById('candidateAdd').onclick = ()=>{
+    document.getElementById('candidateList').insertAdjacentHTML('beforeend', candidateRowHtml());
+  };
+  document.getElementById('candidateList').addEventListener('click', (e)=>{
+    if(e.target.classList.contains('candidate-remove')) e.target.closest('.candidate-row').remove();
+  });
+
   if(editing){
     document.getElementById('f-images').onchange = (e)=> handleImageUpload(e.target.files);
     document.querySelectorAll('.thumb-remove').forEach(btn=>{
@@ -282,6 +332,7 @@ async function saveDetails(){
     outcome: document.getElementById('f-outcome').value.trim() || null,
     recommendation: document.getElementById('f-recommendation').value.trim() || null,
     tags: document.getElementById('f-tags').value.split(',').map(t=>t.trim()).filter(Boolean),
+    candidate_machines: getCandidateMachines(),
     checklist: getVocabValues('checklist'),
     framework_topics: getVocabValues('framework_topics'),
     featured: document.getElementById('f-featured').checked,

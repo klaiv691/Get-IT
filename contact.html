@@ -41,17 +41,12 @@
 </div>
 <main class="wrap">
 
-  <div class="grid-3" style="margin-bottom:var(--space-6);">
-    <div class="action-card">
-      <h3>Book a Laptop Inspection</h3>
-      <p>UGX 50,000 covers a full pre-purchase or diagnostic inspection — CPU, GPU, RAM, storage health, battery, thermals, and more — before you commit to buying or repairing a machine.</p>
-      <a class="plain" id="waBook" href="#" target="_blank" rel="noopener">Message on WhatsApp</a>
-      <span class="alt-contact">Or call / WhatsApp <a href="tel:+256785739120">+256 785 739 120</a></span>
-    </div>
+  <div class="action-grid">
     <div class="action-card">
       <h3>PC Sourcing</h3>
       <p>Can't find the right machine yourself? UGX 50,000 to start (UGX 25,000 to resubscribe) — tell me your budget and specs and I'll find and verify matching options within a fixed 4–5 day window. No obligation if nothing works out.</p>
       <a class="plain" id="waSourcing" href="#" target="_blank" rel="noopener">Message on WhatsApp</a>
+      <span class="alt-contact">Or call / WhatsApp <a href="tel:+256785739120">+256 785 739 120</a></span>
     </div>
     <div class="action-card">
       <h3>Business Enquiries</h3>
@@ -100,7 +95,6 @@
 </main>
 
 <script>
-document.getElementById('waBook').href = waLink('256705748346', "Hi Get-IT, I'd like to book a laptop inspection (UGX 50,000). Can we arrange a time?");
 document.getElementById('waSourcing').href = waLink('256705748346', "Hi Get-IT, I'd like to start a PC sourcing search (UGX 50,000). Here's my budget and specs:");
 
 const serviceSelect = document.getElementById('f-service');
