@@ -72,7 +72,7 @@
       async function load() {
         const services = await loadSiteContent("services");
         const service = (services.items || []).find(
-          (item) => item.key === "repairs",
+          (item) => item.published !== false && item.key === "repairs",
         );
         if (service) {
           setText("serviceTitle", service.title);

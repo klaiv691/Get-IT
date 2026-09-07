@@ -71,7 +71,8 @@
       async function load() {
         const services = await loadSiteContent("services");
         const service = (services.items || []).find(
-          (item) => item.key === "dual-boot-os-setup",
+          (item) =>
+            item.published !== false && item.key === "dual-boot-os-setup",
         );
         if (service) {
           setText("serviceTitle", service.title);

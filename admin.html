@@ -485,6 +485,7 @@
       };
 
       let contentRows = {};
+      let contentPublished = {};
 
       async function loadContentManager() {
         const slot = document.getElementById("contentManager");
@@ -492,7 +493,7 @@
           '<div class="loading"><div class="spinner"></div>Loading site content...</div>';
         const { data, error } = await sb
           .from("site_content")
-          .select("content_key,content");
+          .select("content_key,content,published");
         if (error) {
           slot.innerHTML = `<div class="empty">Could not load site content: ${escapeHtml(error.message)}</div>`;
           return;
@@ -500,16 +501,51 @@
         contentRows = Object.fromEntries(
           (data || []).map((row) => [row.content_key, row.content || {}]),
         );
+        contentPublished = Object.fromEntries(
+          (data || []).map((row) => [row.content_key, row.published !== false]),
+        );
+        const { data: frameworkSections, error: frameworkError } = await sb
+          .from("framework_sections")
+          .select("*")
+          .order("sort_order");
+        if (frameworkError) {
+          slot.innerHTML = `<div class="empty">Could not load framework sections: ${escapeHtml(frameworkError.message)}</div>`;
+          return;
+        }
         slot.innerHTML = `
           <div class="admin-page-head"><div><h2>Site content</h2><p>Edit public information without touching the page code.</p></div><a class="ghost" href="index.html">View public site</a></div>
           ${Object.entries(CONTENT_FORM_DEFS)
             .map(([key, def]) =>
-              contentFormHtml(key, def, contentRows[key] || {}),
+              contentFormHtml(
+                key,
+                def,
+                contentRows[key] || {},
+                contentPublished[key] !== false,
+              ),
             )
             .join("")}
           ${homeServiceCardsFormHtml(contentRows.homepage || {})}
           ${servicesFormHtml(contentRows.services || {})}
+          ${frameworkSectionsFormHtml(frameworkSections || [])}
         `;
+        document
+          .getElementById("homeServiceContentRows")
+          .insertAdjacentHTML(
+            "afterend",
+            '<div class="form-actions"><button class="ghost" type="button" id="add-home-service-card">+ Add card</button></div>',
+          );
+        document
+          .getElementById("serviceContentRows")
+          .insertAdjacentHTML(
+            "afterend",
+            '<div class="form-actions"><button class="ghost" type="button" id="add-service">+ Add service</button></div>',
+          );
+        document
+          .getElementById("frameworkContentRows")
+          .insertAdjacentHTML(
+            "afterend",
+            '<div class="form-actions"><button class="ghost" type="button" id="add-framework-section">+ Add section</button></div>',
+          );
         slot.querySelectorAll("[data-save-content]").forEach((button) => {
           button.onclick = () => saveContentRecord(button.dataset.saveContent);
         });
@@ -519,9 +555,20 @@
           "save-home-service-cards",
         );
         if (homeCardsButton) homeCardsButton.onclick = saveHomeServiceCards;
+        document.getElementById("save-framework-sections").onclick =
+          saveFrameworkSections;
+        document.getElementById("add-home-service-card").onclick =
+          addHomeServiceCard;
+        document.getElementById("add-service").onclick = addService;
+        document.getElementById("add-framework-section").onclick =
+          addFrameworkSection;
+        slot.querySelectorAll(".service-content-row").forEach(addRemoveButton);
+        slot
+          .querySelectorAll(".framework-content-row")
+          .forEach(addRemoveButton);
       }
 
-      function contentFormHtml(key, definition, values) {
+      function contentFormHtml(key, definition, values, published) {
         return `<div class="entry-form content-form"><h3 class="form-section-title">${definition.title}</h3><p class="field-hint">${definition.description}</p><div class="grid2">${definition.fields
           .map(
             ([field, label, type]) => `
@@ -530,7 +577,7 @@
           )
           .join(
             "",
-          )}</div><div class="form-actions"><span class="field-hint">Changes publish immediately.</span><button class="plain" type="button" data-save-content="${key}">Save ${definition.title.toLowerCase()}</button></div></div>`;
+          )}</div><div class="form-actions"><label class="public-check"><input type="checkbox" data-content-published="${key}" ${published ? "checked" : ""}> Published</label><button class="plain" type="button" data-save-content="${key}">Save ${definition.title.toLowerCase()}</button></div></div>`;
       }
 
       function servicesFormHtml(values) {
@@ -538,7 +585,7 @@
         return `<div class="entry-form content-form"><h3 class="form-section-title">Services</h3><p class="field-hint">Edit the service descriptions used on service pages. Keep each service key unchanged because it matches the page filename.</p><div id="serviceContentRows">${items
           .map(
             (item, index) => `
-          <div class="service-content-row" data-service-index="${index}"><div class="grid2"><div class="field"><label>Page key</label><input type="text" data-service-field="key" value="${escapeHtml(item.key)}" readonly></div><div class="field"><label>Title</label><input type="text" data-service-field="title" value="${escapeHtml(item.title)}"></div></div><div class="field"><label>Short description</label><textarea data-service-field="summary">${escapeHtml(item.summary)}</textarea></div><div class="field"><label>Additional description</label><textarea data-service-field="description">${escapeHtml(item.description)}</textarea></div></div>
+          <div class="service-content-row" data-service-index="${index}"><div class="grid2"><div class="field"><label>Page key</label><input type="text" data-service-field="key" value="${escapeHtml(item.key)}" readonly></div><div class="field"><label>Title</label><input type="text" data-service-field="title" value="${escapeHtml(item.title)}"></div></div><div class="field"><label>Short description</label><textarea data-service-field="summary">${escapeHtml(item.summary)}</textarea></div><div class="field"><label>Additional description</label><textarea data-service-field="description">${escapeHtml(item.description)}</textarea></div><label class="public-check"><input type="checkbox" data-service-field="published" ${item.published !== false ? "checked" : ""}> Published</label></div>
         `,
           )
           .join(
@@ -551,12 +598,86 @@
         return `<div class="entry-form content-form"><h3 class="form-section-title">Homepage service cards</h3><p class="field-hint">These are the four service cards shown near the top of the homepage.</p><div id="homeServiceContentRows">${cards
           .map(
             (card, index) => `
-          <div class="service-content-row"><div class="field"><label for="home-card-title-${index}">Card ${index + 1} title</label><input id="home-card-title-${index}" data-home-card="title" type="text" value="${escapeHtml(card.title)}"></div><div class="field"><label for="home-card-body-${index}">Card description</label><textarea id="home-card-body-${index}" data-home-card="body">${escapeHtml(card.body)}</textarea></div></div>
+          <div class="service-content-row"><div class="field"><label for="home-card-title-${index}">Card ${index + 1} title</label><input id="home-card-title-${index}" data-home-card="title" type="text" value="${escapeHtml(card.title)}"></div><div class="field"><label for="home-card-body-${index}">Card description</label><textarea id="home-card-body-${index}" data-home-card="body">${escapeHtml(card.body)}</textarea></div><label class="public-check"><input type="checkbox" data-home-card="published" ${card.published !== false ? "checked" : ""}> Published</label></div>
         `,
           )
           .join(
             "",
           )}</div><div class="form-actions"><span class="field-hint">Changes publish immediately.</span><button class="plain" type="button" id="save-home-service-cards">Save homepage cards</button></div></div>`;
+      }
+
+      function frameworkSectionsFormHtml(rows) {
+        return `<div class="entry-form content-form"><h3 class="form-section-title">Framework sections</h3><p class="field-hint">Add or edit the steps and service-specific modules shown on the framework page.</p><div id="frameworkContentRows">${rows.map((row) => frameworkRowHtml(row)).join("")}</div><div class="form-actions"><button class="plain" type="button" id="save-framework-sections">Save framework sections</button></div></div>`;
+      }
+
+      function frameworkRowHtml(row) {
+        return `<div class="framework-content-row service-content-row"><div class="grid2"><div class="field"><label>Key</label><input type="text" data-framework-field="section_key" value="${escapeHtml(row.section_key || "new-section")}"></div><div class="field"><label>Type</label><select data-framework-field="section_type"><option value="core" ${row.section_type === "core" ? "selected" : ""}>Core step</option><option value="module" ${row.section_type === "module" ? "selected" : ""}>Service module</option></select></div></div><div class="grid2"><div class="field"><label>Title</label><input type="text" data-framework-field="title" value="${escapeHtml(row.title)}"></div><div class="field"><label>Order</label><input type="number" data-framework-field="sort_order" value="${Number(row.sort_order) || 0}"></div></div><div class="field"><label>Description</label><textarea data-framework-field="body">${escapeHtml(row.body)}</textarea></div><label class="public-check"><input type="checkbox" data-framework-field="published" ${row.published ? "checked" : ""}> Published</label><input type="hidden" data-framework-id value="${escapeHtml(row.id || "")}"></div>`;
+      }
+
+      function addRemoveButton(row) {
+        if (row.querySelector("[data-framework-id]")?.value) return;
+        row.insertAdjacentHTML(
+          "beforeend",
+          '<button class="candidate-remove" type="button" data-remove-content-row>Remove</button>',
+        );
+        row.querySelector("[data-remove-content-row]").onclick = () =>
+          row.remove();
+      }
+
+      function addHomeServiceCard() {
+        const container = document.getElementById("homeServiceContentRows");
+        const index = container.children.length;
+        const row = document.createElement("div");
+        row.className = "service-content-row";
+        row.innerHTML = `<div class="field"><label>Card ${index + 1} title</label><input data-home-card="title" type="text"></div><div class="field"><label>Card description</label><textarea data-home-card="body"></textarea></div><label class="public-check"><input type="checkbox" data-home-card="published" checked> Published</label>`;
+        container.appendChild(row);
+        addRemoveButton(row);
+      }
+
+      function addService() {
+        const container = document.getElementById("serviceContentRows");
+        const row = document.createElement("div");
+        row.className = "service-content-row";
+        row.innerHTML =
+          '<div class="grid2"><div class="field"><label>Page key</label><input type="text" data-service-field="key" value="new-service"></div><div class="field"><label>Title</label><input type="text" data-service-field="title"></div></div><div class="field"><label>Short description</label><textarea data-service-field="summary"></textarea></div><div class="field"><label>Additional description</label><textarea data-service-field="description"></textarea></div><label class="public-check"><input type="checkbox" data-service-field="published" checked> Published</label>';
+        container.appendChild(row);
+        addRemoveButton(row);
+      }
+
+      function addFrameworkSection() {
+        const container = document.getElementById("frameworkContentRows");
+        const row = document.createElement("div");
+        row.className = "framework-content-row service-content-row";
+        row.innerHTML =
+          '<div class="grid2"><div class="field"><label>Key</label><input type="text" data-framework-field="section_key" value="new-section"></div><div class="field"><label>Type</label><select data-framework-field="section_type"><option value="core">Core step</option><option value="module" selected>Service module</option></select></div></div><div class="grid2"><div class="field"><label>Title</label><input type="text" data-framework-field="title"></div><div class="field"><label>Order</label><input type="number" data-framework-field="sort_order" value="0"></div></div><div class="field"><label>Description</label><textarea data-framework-field="body"></textarea></div><label class="public-check"><input type="checkbox" data-framework-field="published" checked> Published</label>';
+        container.appendChild(row);
+        addRemoveButton(row);
+      }
+
+      async function saveFrameworkSections() {
+        const rows = Array.from(
+          document.querySelectorAll(
+            "#frameworkContentRows .framework-content-row",
+          ),
+        );
+        for (const row of rows) {
+          const payload = {};
+          row.querySelectorAll("[data-framework-field]").forEach((field) => {
+            payload[field.dataset.frameworkField] =
+              field.type === "checkbox" ? field.checked : field.value.trim();
+          });
+          payload.sort_order = Number(payload.sort_order) || 0;
+          const id = row.querySelector("[data-framework-id]")?.value;
+          const result = id
+            ? await sb.from("framework_sections").update(payload).eq("id", id)
+            : await sb.from("framework_sections").insert(payload);
+          if (result.error) {
+            alert("Could not save framework section: " + result.error.message);
+            return;
+          }
+        }
+        alert("Framework sections saved.");
+        loadContentManager();
       }
 
       async function saveContentRecord(key) {
@@ -566,14 +687,18 @@
           .forEach((field) => {
             content[field.dataset.contentField] = field.value.trim();
           });
+        const published =
+          document.querySelector(`[data-content-published="${key}"]`)
+            ?.checked !== false;
         const { error } = await sb
           .from("site_content")
-          .upsert({ content_key: key, content, published: true });
+          .upsert({ content_key: key, content, published });
         if (error) {
           alert("Could not save content: " + error.message);
           return;
         }
         contentRows[key] = content;
+        contentPublished[key] = published;
         alert("Content saved.");
       }
 
@@ -583,14 +708,19 @@
         ).map((row) => {
           const item = {};
           row.querySelectorAll("[data-service-field]").forEach((field) => {
-            item[field.dataset.serviceField] = field.value.trim();
+            item[field.dataset.serviceField] =
+              field.type === "checkbox" ? field.checked : field.value.trim();
           });
           return item;
         });
         const content = { ...(contentRows.services || {}), items };
         const { error } = await sb
           .from("site_content")
-          .upsert({ content_key: "services", content, published: true });
+          .upsert({
+            content_key: "services",
+            content,
+            published: contentPublished.services !== false,
+          });
         if (error) {
           alert("Could not save services: " + error.message);
           return;
@@ -607,7 +737,8 @@
         ).map((row) => {
           const card = {};
           row.querySelectorAll("[data-home-card]").forEach((field) => {
-            card[field.dataset.homeCard] = field.value.trim();
+            card[field.dataset.homeCard] =
+              field.type === "checkbox" ? field.checked : field.value.trim();
           });
           return card;
         });
@@ -617,7 +748,11 @@
         };
         const { error } = await sb
           .from("site_content")
-          .upsert({ content_key: "homepage", content, published: true });
+          .upsert({
+            content_key: "homepage",
+            content,
+            published: contentPublished.homepage !== false,
+          });
         if (error) {
           alert("Could not save homepage cards: " + error.message);
           return;

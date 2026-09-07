@@ -308,10 +308,12 @@
         setText("homeHeroTitle", content.hero_title);
         setText("homeHeroBody", content.hero_body);
         setText("homeServicesHeading", content.services_heading);
-        (content.service_cards || []).forEach((card, index) => {
-          setText(`homeServiceTitle${index}`, card.title);
-          setText(`homeServiceBody${index}`, card.body);
-        });
+        (content.service_cards || [])
+          .filter((card) => card.published !== false)
+          .forEach((card, index) => {
+            setText(`homeServiceTitle${index}`, card.title);
+            setText(`homeServiceBody${index}`, card.body);
+          });
         setText("homeAssessmentTitle", content.assessment_title);
         setText("homeAssessmentBody", content.assessment_body);
         setText("homeWhyHeading", content.why_heading);
