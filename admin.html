@@ -429,59 +429,84 @@
       const CONTENT_FORM_DEFS = {
         site_settings: {
           title: "Site settings",
-          description: "Contact and identity details used across the public site.",
+          description:
+            "Contact and identity details used across the public site.",
           fields: [
-            ["brand_name", "Business name"], ["owner", "Owner name"],
-            ["tagline", "Tagline"], ["location", "Location"],
-            ["phone", "Phone"], ["whatsapp", "WhatsApp number (digits only)"],
-            ["email", "Email"], ["hours_weekdays", "Monday - Friday hours"],
-            ["hours_saturday", "Saturday hours"], ["hours_sunday", "Sunday hours"]
-          ]
+            ["brand_name", "Business name"],
+            ["owner", "Owner name"],
+            ["tagline", "Tagline"],
+            ["location", "Location"],
+            ["phone", "Phone"],
+            ["whatsapp", "WhatsApp number (digits only)"],
+            ["email", "Email"],
+            ["hours_weekdays", "Monday - Friday hours"],
+            ["hours_saturday", "Saturday hours"],
+            ["hours_sunday", "Sunday hours"],
+          ],
         },
         homepage: {
           title: "Homepage",
-          description: "The main messages and calls to action visitors see first.",
+          description:
+            "The main messages and calls to action visitors see first.",
           fields: [
-            ["hero_kicker", "Hero location / kicker"], ["hero_title", "Hero heading"],
-            ["hero_body", "Hero description", "textarea"], ["services_heading", "Services heading"],
-            ["assessment_title", "Assessment heading"], ["assessment_body", "Assessment description", "textarea"],
-            ["why_heading", "Why Get-IT heading"], ["enterprise_title", "Enterprise heading"],
-            ["enterprise_body", "Enterprise description", "textarea"], ["cta_title", "Final CTA heading"],
-            ["cta_body", "Final CTA description", "textarea"]
-          ]
+            ["hero_kicker", "Hero location / kicker"],
+            ["hero_title", "Hero heading"],
+            ["hero_body", "Hero description", "textarea"],
+            ["services_heading", "Services heading"],
+            ["assessment_title", "Assessment heading"],
+            ["assessment_body", "Assessment description", "textarea"],
+            ["why_heading", "Why Get-IT heading"],
+            ["enterprise_title", "Enterprise heading"],
+            ["enterprise_body", "Enterprise description", "textarea"],
+            ["cta_title", "Final CTA heading"],
+            ["cta_body", "Final CTA description", "textarea"],
+          ],
         },
         contact_page: {
           title: "Contact page",
-          description: "Editable contact-page copy. Phone, email, and hours come from Site settings.",
+          description:
+            "Editable contact-page copy. Phone, email, and hours come from Site settings.",
           fields: [
-            ["hero_title", "Hero heading"], ["hero_body", "Hero description", "textarea"],
-            ["sourcing_body", "PC sourcing description", "textarea"], ["sourcing_price", "PC sourcing price"],
+            ["hero_title", "Hero heading"],
+            ["hero_body", "Hero description", "textarea"],
+            ["sourcing_body", "PC sourcing description", "textarea"],
+            ["sourcing_price", "PC sourcing price"],
             ["business_body", "Business enquiries description", "textarea"],
-            ["service_area", "Service area", "textarea"], ["general_body", "General questions description", "textarea"],
-            ["urgent_note", "Urgent support note", "textarea"]
-          ]
+            ["service_area", "Service area", "textarea"],
+            ["general_body", "General questions description", "textarea"],
+            ["urgent_note", "Urgent support note", "textarea"],
+          ],
         },
         framework_page: {
           title: "Framework introduction",
           description: "The introduction shown above the framework steps.",
-          fields: [["intro", "Introduction", "textarea"]]
-        }
+          fields: [["intro", "Introduction", "textarea"]],
+        },
       };
 
       let contentRows = {};
 
       async function loadContentManager() {
         const slot = document.getElementById("contentManager");
-        slot.innerHTML = '<div class="loading"><div class="spinner"></div>Loading site content...</div>';
-        const { data, error } = await sb.from("site_content").select("content_key,content");
+        slot.innerHTML =
+          '<div class="loading"><div class="spinner"></div>Loading site content...</div>';
+        const { data, error } = await sb
+          .from("site_content")
+          .select("content_key,content");
         if (error) {
           slot.innerHTML = `<div class="empty">Could not load site content: ${escapeHtml(error.message)}</div>`;
           return;
         }
-        contentRows = Object.fromEntries((data || []).map((row) => [row.content_key, row.content || {}]));
+        contentRows = Object.fromEntries(
+          (data || []).map((row) => [row.content_key, row.content || {}]),
+        );
         slot.innerHTML = `
           <div class="admin-page-head"><div><h2>Site content</h2><p>Edit public information without touching the page code.</p></div><a class="ghost" href="index.html">View public site</a></div>
-          ${Object.entries(CONTENT_FORM_DEFS).map(([key, def]) => contentFormHtml(key, def, contentRows[key] || {})).join("")}
+          ${Object.entries(CONTENT_FORM_DEFS)
+            .map(([key, def]) =>
+              contentFormHtml(key, def, contentRows[key] || {}),
+            )
+            .join("")}
           ${homeServiceCardsFormHtml(contentRows.homepage || {})}
           ${servicesFormHtml(contentRows.services || {})}
         `;
@@ -490,63 +515,113 @@
         });
         const servicesButton = document.getElementById("save-services");
         if (servicesButton) servicesButton.onclick = saveServicesContent;
-        const homeCardsButton = document.getElementById("save-home-service-cards");
+        const homeCardsButton = document.getElementById(
+          "save-home-service-cards",
+        );
         if (homeCardsButton) homeCardsButton.onclick = saveHomeServiceCards;
       }
 
       function contentFormHtml(key, definition, values) {
-        return `<div class="entry-form content-form"><h3 class="form-section-title">${definition.title}</h3><p class="field-hint">${definition.description}</p><div class="grid2">${definition.fields.map(([field, label, type]) => `
+        return `<div class="entry-form content-form"><h3 class="form-section-title">${definition.title}</h3><p class="field-hint">${definition.description}</p><div class="grid2">${definition.fields
+          .map(
+            ([field, label, type]) => `
           <div class="field"><label for="content-${key}-${field}">${label}</label>${type === "textarea" ? `<textarea id="content-${key}-${field}" data-content-record="${key}" data-content-field="${field}">${escapeHtml(values[field])}</textarea>` : `<input type="text" id="content-${key}-${field}" data-content-record="${key}" data-content-field="${field}" value="${escapeHtml(values[field])}">`}</div>
-        `).join("")}</div><div class="form-actions"><span class="field-hint">Changes publish immediately.</span><button class="plain" type="button" data-save-content="${key}">Save ${definition.title.toLowerCase()}</button></div></div>`;
+        `,
+          )
+          .join(
+            "",
+          )}</div><div class="form-actions"><span class="field-hint">Changes publish immediately.</span><button class="plain" type="button" data-save-content="${key}">Save ${definition.title.toLowerCase()}</button></div></div>`;
       }
 
       function servicesFormHtml(values) {
         const items = values.items || [];
-        return `<div class="entry-form content-form"><h3 class="form-section-title">Services</h3><p class="field-hint">Edit the service descriptions used on service pages. Keep each service key unchanged because it matches the page filename.</p><div id="serviceContentRows">${items.map((item, index) => `
+        return `<div class="entry-form content-form"><h3 class="form-section-title">Services</h3><p class="field-hint">Edit the service descriptions used on service pages. Keep each service key unchanged because it matches the page filename.</p><div id="serviceContentRows">${items
+          .map(
+            (item, index) => `
           <div class="service-content-row" data-service-index="${index}"><div class="grid2"><div class="field"><label>Page key</label><input type="text" data-service-field="key" value="${escapeHtml(item.key)}" readonly></div><div class="field"><label>Title</label><input type="text" data-service-field="title" value="${escapeHtml(item.title)}"></div></div><div class="field"><label>Short description</label><textarea data-service-field="summary">${escapeHtml(item.summary)}</textarea></div><div class="field"><label>Additional description</label><textarea data-service-field="description">${escapeHtml(item.description)}</textarea></div></div>
-        `).join("")}</div><div class="form-actions"><span class="field-hint">Changes publish immediately.</span><button class="plain" type="button" id="save-services">Save services</button></div></div>`;
+        `,
+          )
+          .join(
+            "",
+          )}</div><div class="form-actions"><span class="field-hint">Changes publish immediately.</span><button class="plain" type="button" id="save-services">Save services</button></div></div>`;
       }
 
       function homeServiceCardsFormHtml(values) {
         const cards = values.service_cards || [];
-        return `<div class="entry-form content-form"><h3 class="form-section-title">Homepage service cards</h3><p class="field-hint">These are the four service cards shown near the top of the homepage.</p><div id="homeServiceContentRows">${cards.map((card, index) => `
+        return `<div class="entry-form content-form"><h3 class="form-section-title">Homepage service cards</h3><p class="field-hint">These are the four service cards shown near the top of the homepage.</p><div id="homeServiceContentRows">${cards
+          .map(
+            (card, index) => `
           <div class="service-content-row"><div class="field"><label for="home-card-title-${index}">Card ${index + 1} title</label><input id="home-card-title-${index}" data-home-card="title" type="text" value="${escapeHtml(card.title)}"></div><div class="field"><label for="home-card-body-${index}">Card description</label><textarea id="home-card-body-${index}" data-home-card="body">${escapeHtml(card.body)}</textarea></div></div>
-        `).join("")}</div><div class="form-actions"><span class="field-hint">Changes publish immediately.</span><button class="plain" type="button" id="save-home-service-cards">Save homepage cards</button></div></div>`;
+        `,
+          )
+          .join(
+            "",
+          )}</div><div class="form-actions"><span class="field-hint">Changes publish immediately.</span><button class="plain" type="button" id="save-home-service-cards">Save homepage cards</button></div></div>`;
       }
 
       async function saveContentRecord(key) {
         const content = { ...(contentRows[key] || {}) };
-        document.querySelectorAll(`[data-content-record="${key}"]`).forEach((field) => {
-          content[field.dataset.contentField] = field.value.trim();
-        });
-        const { error } = await sb.from("site_content").upsert({ content_key: key, content, published: true });
-        if (error) { alert("Could not save content: " + error.message); return; }
+        document
+          .querySelectorAll(`[data-content-record="${key}"]`)
+          .forEach((field) => {
+            content[field.dataset.contentField] = field.value.trim();
+          });
+        const { error } = await sb
+          .from("site_content")
+          .upsert({ content_key: key, content, published: true });
+        if (error) {
+          alert("Could not save content: " + error.message);
+          return;
+        }
         contentRows[key] = content;
         alert("Content saved.");
       }
 
       async function saveServicesContent() {
-        const items = Array.from(document.querySelectorAll("#serviceContentRows .service-content-row")).map((row) => {
+        const items = Array.from(
+          document.querySelectorAll("#serviceContentRows .service-content-row"),
+        ).map((row) => {
           const item = {};
-          row.querySelectorAll("[data-service-field]").forEach((field) => { item[field.dataset.serviceField] = field.value.trim(); });
+          row.querySelectorAll("[data-service-field]").forEach((field) => {
+            item[field.dataset.serviceField] = field.value.trim();
+          });
           return item;
         });
         const content = { ...(contentRows.services || {}), items };
-        const { error } = await sb.from("site_content").upsert({ content_key: "services", content, published: true });
-        if (error) { alert("Could not save services: " + error.message); return; }
+        const { error } = await sb
+          .from("site_content")
+          .upsert({ content_key: "services", content, published: true });
+        if (error) {
+          alert("Could not save services: " + error.message);
+          return;
+        }
         contentRows.services = content;
         alert("Services saved.");
       }
 
       async function saveHomeServiceCards() {
-        const cards = Array.from(document.querySelectorAll("#homeServiceContentRows .service-content-row")).map((row) => {
+        const cards = Array.from(
+          document.querySelectorAll(
+            "#homeServiceContentRows .service-content-row",
+          ),
+        ).map((row) => {
           const card = {};
-          row.querySelectorAll("[data-home-card]").forEach((field) => { card[field.dataset.homeCard] = field.value.trim(); });
+          row.querySelectorAll("[data-home-card]").forEach((field) => {
+            card[field.dataset.homeCard] = field.value.trim();
+          });
           return card;
         });
-        const content = { ...(contentRows.homepage || {}), service_cards: cards };
-        const { error } = await sb.from("site_content").upsert({ content_key: "homepage", content, published: true });
-        if (error) { alert("Could not save homepage cards: " + error.message); return; }
+        const content = {
+          ...(contentRows.homepage || {}),
+          service_cards: cards,
+        };
+        const { error } = await sb
+          .from("site_content")
+          .upsert({ content_key: "homepage", content, published: true });
+        if (error) {
+          alert("Could not save homepage cards: " + error.message);
+          return;
+        }
         contentRows.homepage = content;
         alert("Homepage cards saved.");
       }

@@ -70,10 +70,15 @@
     <script>
       async function load() {
         const services = await loadSiteContent("services");
-        const service = (services.items || []).find((item) => item.key === "dual-boot-os-setup");
+        const service = (services.items || []).find(
+          (item) => item.key === "dual-boot-os-setup",
+        );
         if (service) {
           setText("serviceTitle", service.title);
-          setText("serviceBody", [service.summary, service.description].filter(Boolean).join(" "));
+          setText(
+            "serviceBody",
+            [service.summary, service.description].filter(Boolean).join(" "),
+          );
         }
         const { data, error } = await sb
           .from("projects")

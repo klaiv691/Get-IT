@@ -66,7 +66,9 @@ async function applySiteSettings() {
     });
   }
   if (settings.owner || settings.tagline) {
-    const descriptor = [settings.owner, settings.tagline].filter(Boolean).join(" · ");
+    const descriptor = [settings.owner, settings.tagline]
+      .filter(Boolean)
+      .join(" · ");
     document.querySelectorAll(".masthead p").forEach((element) => {
       element.textContent = descriptor;
     });

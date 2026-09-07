@@ -86,7 +86,8 @@
           <a
             class="plain"
             href="mailto:marvinclive16@gmail.com?subject=Business%20Enquiry"
-            id="businessEmail">Email Get-IT</a
+            id="businessEmail"
+            >Email Get-IT</a
           >
         </div>
       </div>
@@ -95,7 +96,10 @@
         <h3 style="margin: 0 0 6px; color: var(--navy); font-size: 17px">
           General Questions
         </h3>
-        <p id="contactGeneralBody" style="margin: 0 0 16px; color: var(--ink-soft); font-size: 13.5px">
+        <p
+          id="contactGeneralBody"
+          style="margin: 0 0 16px; color: var(--ink-soft); font-size: 13.5px"
+        >
           Not sure which category your question falls into? Send a message below
           and I'll get back to you — usually within a day.
         </p>
@@ -157,10 +161,14 @@
             ><span class="time" id="hoursSaturday">10:00 AM – 2:00 PM</span>
           </li>
           <li>
-            <span class="day">Sunday</span><span class="time" id="hoursSunday">Closed</span>
+            <span class="day">Sunday</span
+            ><span class="time" id="hoursSunday">Closed</span>
           </li>
         </ul>
-        <p id="contactUrgentNote" style="margin-top: 12px; color: var(--ink-soft); font-size: 13px">
+        <p
+          id="contactUrgentNote"
+          style="margin-top: 12px; color: var(--ink-soft); font-size: 13px"
+        >
           Urgent business IT issues (network down, security incident) — message
           on WhatsApp any time; I respond as soon as I can outside these hours.
         </p>
@@ -190,12 +198,19 @@
         ]);
         setText("contactHeroTitle", content.hero_title);
         setText("contactHeroBody", content.hero_body);
-        setText("contactSourcingBody", [content.sourcing_price, content.sourcing_body].filter(Boolean).join(" — "));
+        setText(
+          "contactSourcingBody",
+          [content.sourcing_price, content.sourcing_body]
+            .filter(Boolean)
+            .join(" — "),
+        );
         setText("contactBusinessBody", content.business_body);
         setText("contactServiceArea", content.service_area);
         setText("contactGeneralBody", content.general_body);
         setText("contactUrgentNote", content.urgent_note);
-        const phoneLink = document.querySelector(".alt-contact a[href^='tel:']");
+        const phoneLink = document.querySelector(
+          ".alt-contact a[href^='tel:']",
+        );
         if (phoneLink && settings.phone) {
           phoneLink.href = `tel:${settings.phone.replace(/[^+\d]/g, "")}`;
           phoneLink.textContent = settings.phone;
@@ -205,7 +220,10 @@
           emailLink.href = `mailto:${settings.email}?subject=Business%20Enquiry`;
         }
         if (settings.whatsapp) {
-          document.getElementById("waSourcing").href = waLink(settings.whatsapp, "Hi Get-IT, I'd like to start a PC sourcing search. Here's my budget and specs:");
+          document.getElementById("waSourcing").href = waLink(
+            settings.whatsapp,
+            "Hi Get-IT, I'd like to start a PC sourcing search. Here's my budget and specs:",
+          );
         }
         setText("hoursWeekdays", settings.hours_weekdays);
         setText("hoursSaturday", settings.hours_saturday);
