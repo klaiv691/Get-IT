@@ -1,230 +1,514 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Case study admin · Get-IT</title>
-<link rel="icon" type="image/png" href="assets/logo-icon.png">
-<link rel="stylesheet" href="assets/style.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="assets/app.js"></script>
-<style>
-  .login-wrap{display:flex;flex-direction:column;align-items:center;margin-top:56px;}
-  .login-wrap .mark{margin-bottom:16px;width:46px;height:46px;}
-  .login-box{max-width:340px;width:100%;background:var(--maroon);border:1px solid var(--gold);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow-md);}
-  .login-box label{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold);margin-bottom:5px;}
-  .login-box .field{margin-bottom:14px;}
-  .login-error{color:#F3C6BE;font-size:12.5px;margin-top:10px;}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Case study admin · Get-IT</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/png" href="assets/logo-icon.png" />
+    <link rel="stylesheet" href="assets/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/app.js"></script>
+    <style>
+      .login-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 56px;
+      }
+      .login-wrap .mark {
+        margin-bottom: 16px;
+        width: 46px;
+        height: 46px;
+      }
+      .login-box {
+        max-width: 340px;
+        width: 100%;
+        background: var(--maroon);
+        border: 1px solid var(--gold);
+        border-radius: var(--radius);
+        padding: 26px;
+        box-shadow: var(--shadow-md);
+      }
+      .login-box label {
+        display: block;
+        font-size: 10.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--gold);
+        margin-bottom: 5px;
+      }
+      .login-box .field {
+        margin-bottom: 14px;
+      }
+      .login-error {
+        color: #f3c6be;
+        font-size: 12.5px;
+        margin-top: 10px;
+      }
 
-  .entry-form{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:var(--space-5);margin-bottom:var(--space-6);box-shadow:var(--shadow-md);}
-  .entry-form .grid2{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);margin-bottom:var(--space-3);}
-  .entry-form label{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-soft);margin-bottom:4px;}
-  .entry-form textarea{resize:vertical;min-height:60px;}
-  .field-hint{font-size:11px;color:var(--ink-faint);margin-top:4px;}
-  .form-section-title{font-size:13px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.05em;margin:var(--space-5) 0 var(--space-3);padding-top:var(--space-4);border-top:1px dashed var(--line);}
-  .form-section-title:first-child{margin-top:0;padding-top:0;border-top:none;}
-  .form-actions{display:flex;justify-content:space-between;align-items:center;margin-top:var(--space-4);flex-wrap:wrap;gap:10px;}
-  .public-check{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-soft);}
-  .check-row{display:flex;gap:var(--space-5);flex-wrap:wrap;}
+      .entry-form {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: var(--space-5);
+        margin-bottom: var(--space-6);
+        box-shadow: var(--shadow-md);
+      }
+      .entry-form .grid2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-3);
+        margin-bottom: var(--space-3);
+      }
+      .entry-form label {
+        display: block;
+        font-size: 10.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--ink-soft);
+        margin-bottom: 4px;
+      }
+      .entry-form textarea {
+        resize: vertical;
+        min-height: 60px;
+      }
+      .field-hint {
+        font-size: 11px;
+        color: var(--ink-faint);
+        margin-top: 4px;
+      }
+      .form-section-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--navy);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: var(--space-5) 0 var(--space-3);
+        padding-top: var(--space-4);
+        border-top: 1px dashed var(--line);
+      }
+      .form-section-title:first-child {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: none;
+      }
+      .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: var(--space-4);
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .public-check {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 12.5px;
+        color: var(--ink-soft);
+      }
+      .check-row {
+        display: flex;
+        gap: var(--space-5);
+        flex-wrap: wrap;
+      }
 
-  .vocab-domain{border:1px solid var(--line);border-radius:var(--radius-sm);margin-bottom:8px;background:var(--paper);}
-  .vocab-domain summary{cursor:pointer;padding:9px 12px;font-size:12.5px;font-weight:700;color:var(--navy);list-style:revert;}
-  .vocab-domain summary .count{font-weight:400;color:var(--ink-faint);text-transform:none;letter-spacing:0;}
-  .vocab-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;padding:4px 12px 12px 28px;}
-  @media (max-width:520px){.vocab-grid{grid-template-columns:1fr;}}
-  .vocab-grid label{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink);font-weight:400;text-transform:none;letter-spacing:0;}
-  .vocab-grid input{width:auto;}
+      .vocab-domain {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-sm);
+        margin-bottom: 8px;
+        background: var(--paper);
+      }
+      .vocab-domain summary {
+        cursor: pointer;
+        padding: 9px 12px;
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--navy);
+        list-style: revert;
+      }
+      .vocab-domain summary .count {
+        font-weight: 400;
+        color: var(--ink-faint);
+        text-transform: none;
+        letter-spacing: 0;
+      }
+      .vocab-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px 12px;
+        padding: 4px 12px 12px 28px;
+      }
+      @media (max-width: 520px) {
+        .vocab-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .vocab-grid label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12.5px;
+        color: var(--ink);
+        font-weight: 400;
+        text-transform: none;
+        letter-spacing: 0;
+      }
+      .vocab-grid input {
+        width: auto;
+      }
 
-  .candidate-row{display:grid;grid-template-columns:1fr 1fr 130px 1.4fr auto;gap:8px;align-items:start;margin-bottom:8px;padding-bottom:10px;border-bottom:1px dashed var(--line);}
-  @media (max-width:760px){
-    .candidate-row{grid-template-columns:1fr;margin-bottom:14px;}
-    .candidate-remove{justify-self:start;}
-  }
-  .candidate-remove{font-family:var(--serif);font-size:10.5px;font-weight:700;background:none;border:1px solid var(--line);border-radius:var(--radius-sm);padding:9px 10px;cursor:pointer;color:var(--red);white-space:nowrap;}
-  .candidate-remove:hover{background:var(--maroon-bg);}
+      .candidate-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 130px 1.4fr auto;
+        gap: 8px;
+        align-items: start;
+        margin-bottom: 8px;
+        padding-bottom: 10px;
+        border-bottom: 1px dashed var(--line);
+      }
+      @media (max-width: 760px) {
+        .candidate-row {
+          grid-template-columns: 1fr;
+          margin-bottom: 14px;
+        }
+        .candidate-remove {
+          justify-self: start;
+        }
+      }
+      .candidate-remove {
+        font-family: var(--serif);
+        font-size: 10.5px;
+        font-weight: 700;
+        background: none;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-sm);
+        padding: 9px 10px;
+        cursor: pointer;
+        color: var(--red);
+        white-space: nowrap;
+      }
+      .candidate-remove:hover {
+        background: var(--maroon-bg);
+      }
 
-  .thumb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin:var(--space-3) 0;}
-  .thumb{border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;background:var(--paper);}
-  .thumb img{width:100%;height:90px;object-fit:cover;display:block;}
-  .thumb-feature{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--ink-soft);padding:6px 8px 0;}
-  .thumb-feature input{width:auto;}
-  .thumb-remove{width:100%;font-family:var(--serif);font-size:10.5px;background:none;border:none;border-top:1px dashed var(--line);color:var(--red);padding:6px;cursor:pointer;margin-top:6px;}
-  .thumb-remove:hover{background:var(--maroon-bg);}
+      .thumb-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+        margin: var(--space-3) 0;
+      }
+      .thumb {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+        background: var(--paper);
+      }
+      .thumb img {
+        width: 100%;
+        height: 90px;
+        object-fit: cover;
+        display: block;
+      }
+      .thumb-feature {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 10.5px;
+        color: var(--ink-soft);
+        padding: 6px 8px 0;
+      }
+      .thumb-feature input {
+        width: auto;
+      }
+      .thumb-remove {
+        width: 100%;
+        font-family: var(--serif);
+        font-size: 10.5px;
+        background: none;
+        border: none;
+        border-top: 1px dashed var(--line);
+        color: var(--red);
+        padding: 6px;
+        cursor: pointer;
+        margin-top: 6px;
+      }
+      .thumb-remove:hover {
+        background: var(--maroon-bg);
+      }
 
-  .ticket-actions{display:flex;gap:8px;padding:0 14px 14px;flex-wrap:wrap;}
-  .ticket-actions button{font-family:var(--serif);font-size:10.5px;font-weight:700;background:none;border:1px solid var(--line);border-radius:var(--radius-sm);padding:5px 10px;cursor:pointer;color:var(--ink-soft);transition:border-color 160ms var(--ease), color 160ms var(--ease);}
-  .ticket-actions button:hover{border-color:var(--navy);color:var(--navy);}
-  .ticket-actions button.danger:hover{border-color:var(--red);color:var(--red);}
-</style>
-</head>
-<body>
-<div class="masthead">
-  <div class="wrap row">
-    <a class="masthead-left" href="index.html">
-      <img class="mark" src="assets/logo-icon.png" alt="Get-IT">
-      <h1>Case study admin</h1>
-    </a>
-    <div id="headerRight" class="count"></div>
-  </div>
-</div>
-<div class="hairline"></div>
-<main class="wrap">
-  <div id="app"><div class="loading"><div class="spinner"></div>Checking session...</div></div>
-</main>
+      .ticket-actions {
+        display: flex;
+        gap: 8px;
+        padding: 0 14px 14px;
+        flex-wrap: wrap;
+      }
+      .ticket-actions button {
+        font-family: var(--serif);
+        font-size: 10.5px;
+        font-weight: 700;
+        background: none;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-sm);
+        padding: 5px 10px;
+        cursor: pointer;
+        color: var(--ink-soft);
+        transition:
+          border-color 160ms var(--ease),
+          color 160ms var(--ease);
+      }
+      .ticket-actions button:hover {
+        border-color: var(--navy);
+        color: var(--navy);
+      }
+      .ticket-actions button.danger:hover {
+        border-color: var(--red);
+        color: var(--red);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="masthead">
+      <div class="wrap row">
+        <a class="masthead-left" href="index.html">
+          <img class="mark" src="assets/logo-icon.png" alt="Get-IT" />
+          <h1>Case study admin</h1>
+        </a>
+        <div id="headerRight" class="count"></div>
+      </div>
+    </div>
+    <div class="hairline"></div>
+    <main class="wrap">
+      <div id="app">
+        <div class="loading">
+          <div class="spinner"></div>
+          Checking session...
+        </div>
+      </div>
+    </main>
 
-<script>
-let entries = [];
-let editingId = null;
-let formOpen = false;
+    <script>
+      let entries = [];
+      let editingId = null;
+      let formOpen = false;
 
-async function checkSession(){
-  const { data:{ session } } = await sb.auth.getSession();
-  if(session) renderApp();
-  else renderLogin();
-}
+      async function checkSession() {
+        const {
+          data: { session },
+        } = await sb.auth.getSession();
+        if (session) renderApp();
+        else renderLogin();
+      }
 
-function renderLogin(err){
-  document.getElementById('headerRight').textContent = '';
-  document.getElementById('app').innerHTML = `
+      function renderLogin(err) {
+        document.getElementById("headerRight").textContent = "";
+        document.getElementById("app").innerHTML = `
     <div class="login-wrap">
       <img class="mark" src="assets/logo-icon.png" alt="Get-IT">
       <div class="login-box">
         <div class="field"><label>Email</label><input type="email" id="login-email"></div>
         <div class="field"><label>Password</label><input type="password" id="login-pass"></div>
         <button class="plain" id="login-btn" style="width:100%;">Log in</button>
-        ${err ? `<div class="login-error">${escapeHtml(err)}</div>` : ''}
+        ${err ? `<div class="login-error">${escapeHtml(err)}</div>` : ""}
       </div>
     </div>
   `;
-  document.getElementById('login-btn').onclick = async ()=>{
-    const email = document.getElementById('login-email').value.trim();
-    const password = document.getElementById('login-pass').value;
-    const { error } = await sb.auth.signInWithPassword({ email, password });
-    if(error) renderLogin(error.message);
-    else renderApp();
-  };
-}
+        document.getElementById("login-btn").onclick = async () => {
+          const email = document.getElementById("login-email").value.trim();
+          const password = document.getElementById("login-pass").value;
+          const { error } = await sb.auth.signInWithPassword({
+            email,
+            password,
+          });
+          if (error) renderLogin(error.message);
+          else renderApp();
+        };
+      }
 
-async function renderApp(){
-  document.getElementById('headerRight').innerHTML = `<button class="ghost" id="logout-btn" style="border-color:var(--cream);color:var(--cream);">Log out</button>`;
-  document.getElementById('logout-btn').onclick = async ()=>{ await sb.auth.signOut(); renderLogin(); };
+      async function renderApp() {
+        document.getElementById("headerRight").innerHTML =
+          `<button class="ghost" id="logout-btn" style="border-color:var(--cream);color:var(--cream);">Log out</button>`;
+        document.getElementById("logout-btn").onclick = async () => {
+          await sb.auth.signOut();
+          renderLogin();
+        };
 
-  document.getElementById('app').innerHTML = `
-    <div class="toolbar">
-      <input type="text" class="search-input" id="search" placeholder="Search title, notes, tags, device...">
-      <select id="filterCat">
-        <option value="">All categories</option>
-        ${CATEGORIES.map(c=>`<option value="${c}">${c}</option>`).join('')}
-      </select>
-      <select id="filterClient">
-        <option value="">All client types</option>
-        ${CLIENT_TYPES.map(c=>`<option value="${c}">${c}</option>`).join('')}
-      </select>
-      <select id="filterStatus">
-        <option value="">All statuses</option>
-        <option value="published">Published</option>
-        <option value="draft">Draft</option>
-      </select>
-      <button class="plain" id="btnNew">+ New case study</button>
+        document.getElementById("app").innerHTML = `
+    <div class="admin-shell">
+      <aside class="admin-sidebar" aria-label="Admin navigation">
+        <div class="admin-sidebar-brand"><strong>Get-IT Admin</strong><span>Content workspace</span></div>
+        <div class="admin-sidebar-section">Workspace</div>
+        <nav>
+          <a href="admin.html" class="active" aria-current="page">Case studies</a>
+          <a href="contact.html">Public contact page</a>
+        </nav>
+        <div class="admin-sidebar-section">Public site</div>
+        <nav>
+          <a href="index.html">View homepage</a>
+          <a href="case-studies.html">View archive</a>
+          <a href="framework.html">View framework</a>
+        </nav>
+      </aside>
+      <section class="admin-main">
+        <div class="admin-page-head">
+          <div><h2>Case studies</h2><p>Manage the evidence visitors see across the public site.</p></div>
+          <button class="plain" id="btnNew">+ New case study</button>
+        </div>
+        <div class="toolbar">
+          <input type="text" class="search-input" id="search" placeholder="Search title, notes, tags, device..." aria-label="Search case studies">
+          <select id="filterCat" aria-label="Filter by category">
+            <option value="">All categories</option>
+            ${CATEGORIES.map((c) => `<option value="${c}">${c}</option>`).join("")}
+          </select>
+          <select id="filterClient" aria-label="Filter by client type">
+            <option value="">All client types</option>
+            ${CLIENT_TYPES.map((c) => `<option value="${c}">${c}</option>`).join("")}
+          </select>
+          <select id="filterStatus" aria-label="Filter by publication status">
+            <option value="">All statuses</option>
+            <option value="published">Published</option>
+            <option value="draft">Draft</option>
+          </select>
+        </div>
+        <div id="formSlot"></div>
+        <div id="listSlot" class="loading"><div class="spinner"></div>Loading entries...</div>
+      </section>
     </div>
-    <div id="formSlot"></div>
-    <div id="listSlot" class="loading"><div class="spinner"></div>Loading entries...</div>
   `;
 
-  document.getElementById('btnNew').onclick = ()=>{ editingId=null; formOpen=true; renderForm(); window.scrollTo({top:0, behavior:'smooth'}); };
-  document.getElementById('search').oninput = renderList;
-  document.getElementById('filterCat').onchange = renderList;
-  document.getElementById('filterClient').onchange = renderList;
-  document.getElementById('filterStatus').onchange = renderList;
+        document.getElementById("btnNew").onclick = () => {
+          editingId = null;
+          formOpen = true;
+          renderForm();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        };
+        document.getElementById("search").oninput = renderList;
+        document.getElementById("filterCat").onchange = renderList;
+        document.getElementById("filterClient").onchange = renderList;
+        document.getElementById("filterStatus").onchange = renderList;
 
-  await loadEntries();
-}
+        await loadEntries();
+      }
 
-async function loadEntries(){
-  const { data, error } = await sb.from('projects').select('*').order('date', { ascending:false });
-  if(error){
-    document.getElementById('listSlot').innerHTML = `<div class="empty">Couldn't load entries: ${escapeHtml(error.message)}</div>`;
-    return;
-  }
-  entries = data;
-  renderList();
-}
+      async function loadEntries() {
+        const { data, error } = await sb
+          .from("projects")
+          .select("*")
+          .order("date", { ascending: false });
+        if (error) {
+          document.getElementById("listSlot").innerHTML =
+            `<div class="empty">Couldn't load entries: ${escapeHtml(error.message)}</div>`;
+          return;
+        }
+        entries = data;
+        renderList();
+      }
 
-function renderVocabBlock(fieldName, selected){
-  selected = selected || [];
-  return Object.entries(VOCAB_DOMAINS).map(([domain, keys])=>{
-    const selectedCount = keys.filter(k=>selected.includes(k)).length;
-    return `
-      <details class="vocab-domain" ${selectedCount ? 'open' : ''}>
-        <summary>${escapeHtml(domain)} <span class="count">${selectedCount ? '('+selectedCount+' selected)' : ''}</span></summary>
+      function renderVocabBlock(fieldName, selected) {
+        selected = selected || [];
+        return Object.entries(VOCAB_DOMAINS)
+          .map(([domain, keys]) => {
+            const selectedCount = keys.filter((k) =>
+              selected.includes(k),
+            ).length;
+            return `
+      <details class="vocab-domain" ${selectedCount ? "open" : ""}>
+        <summary>${escapeHtml(domain)} <span class="count">${selectedCount ? "(" + selectedCount + " selected)" : ""}</span></summary>
         <div class="vocab-grid">
-          ${keys.map(k=>`<label><input type="checkbox" data-field="${fieldName}" value="${k}" ${selected.includes(k)?'checked':''}> ${escapeHtml(vocabLabel(k))}</label>`).join('')}
+          ${keys.map((k) => `<label><input type="checkbox" data-field="${fieldName}" value="${k}" ${selected.includes(k) ? "checked" : ""}> ${escapeHtml(vocabLabel(k))}</label>`).join("")}
         </div>
       </details>`;
-  }).join('');
-}
+          })
+          .join("");
+      }
 
-function getVocabValues(fieldName){
-  return Array.from(document.querySelectorAll(`input[type=checkbox][data-field="${fieldName}"]:checked`)).map(el=>el.value);
-}
+      function getVocabValues(fieldName) {
+        return Array.from(
+          document.querySelectorAll(
+            `input[type=checkbox][data-field="${fieldName}"]:checked`,
+          ),
+        ).map((el) => el.value);
+      }
 
-function candidateRowHtml(c){
-  c = c || { manufacturer:'', model:'', status:'considered', notes:'' };
-  return `
+      function candidateRowHtml(c) {
+        c = c || {
+          manufacturer: "",
+          model: "",
+          status: "considered",
+          notes: "",
+        };
+        return `
     <div class="candidate-row">
       <input type="text" class="cm-manufacturer" placeholder="Manufacturer" value="${escapeHtml(c.manufacturer)}">
       <input type="text" class="cm-model" placeholder="Model" value="${escapeHtml(c.model)}">
       <select class="cm-status">
-        <option value="considered" ${c.status==='considered'?'selected':''}>Considered</option>
-        <option value="selected" ${c.status==='selected'?'selected':''}>Selected</option>
-        <option value="rejected" ${c.status==='rejected'?'selected':''}>Rejected</option>
+        <option value="considered" ${c.status === "considered" ? "selected" : ""}>Considered</option>
+        <option value="selected" ${c.status === "selected" ? "selected" : ""}>Selected</option>
+        <option value="rejected" ${c.status === "rejected" ? "selected" : ""}>Rejected</option>
       </select>
       <input type="text" class="cm-notes" placeholder="Notes" value="${escapeHtml(c.notes)}">
       <button type="button" class="candidate-remove">Remove</button>
     </div>`;
-}
+      }
 
-function getCandidateMachines(){
-  return Array.from(document.querySelectorAll('#candidateList .candidate-row')).map(row => ({
-    manufacturer: row.querySelector('.cm-manufacturer').value.trim(),
-    model: row.querySelector('.cm-model').value.trim(),
-    status: row.querySelector('.cm-status').value,
-    notes: row.querySelector('.cm-notes').value.trim()
-  })).filter(c => c.manufacturer || c.model || c.notes);
-}
+      function getCandidateMachines() {
+        return Array.from(
+          document.querySelectorAll("#candidateList .candidate-row"),
+        )
+          .map((row) => ({
+            manufacturer: row.querySelector(".cm-manufacturer").value.trim(),
+            model: row.querySelector(".cm-model").value.trim(),
+            status: row.querySelector(".cm-status").value,
+            notes: row.querySelector(".cm-notes").value.trim(),
+          }))
+          .filter((c) => c.manufacturer || c.model || c.notes);
+      }
 
-function thumbHtml(path, isFeatured){
-  return `
+      function thumbHtml(path, isFeatured) {
+        return `
     <div class="thumb">
-      <img src="${storageUrl(path)}" alt="">
-      <label class="thumb-feature"><input type="radio" name="featured-image" value="${escapeHtml(path)}" ${isFeatured?'checked':''}> Featured</label>
+      <img src="${escapeHtml(storageUrl(path))}" alt="Uploaded case study image">
+      <label class="thumb-feature"><input type="radio" name="featured-image" value="${escapeHtml(path)}" ${isFeatured ? "checked" : ""}> Featured</label>
       <button type="button" class="thumb-remove" data-path="${escapeHtml(path)}">Remove</button>
     </div>`;
-}
+      }
 
-function renderForm(){
-  const slot = document.getElementById('formSlot');
-  if(!formOpen){ slot.innerHTML=''; return; }
+      function renderForm() {
+        const slot = document.getElementById("formSlot");
+        if (!formOpen) {
+          slot.innerHTML = "";
+          return;
+        }
 
-  const editing = editingId ? entries.find(e=>e.id===editingId) : null;
-  const title = editing ? editing.title : '';
-  const slug = editing ? editing.slug : '';
-  const category = editing ? editing.category : CATEGORIES[0];
-  const clientType = editing ? editing.client_type : CLIENT_TYPES[0];
-  const manufacturer = editing ? (editing.device_manufacturer||'') : '';
-  const model = editing ? (editing.device_model||'') : '';
-  const date = editing ? editing.date : new Date().toISOString().slice(0,10);
-  const problem = editing ? (editing.problem||'') : '';
-  const workPerformed = editing ? (editing.work_performed||'') : '';
-  const outcome = editing ? (editing.outcome||'') : '';
-  const recommendation = editing ? (editing.recommendation||'') : '';
-  const tags = editing ? (editing.tags||[]).join(', ') : '';
-  const featured = editing ? editing.featured : false;
-  const published = editing ? editing.published : false;
+        const editing = editingId
+          ? entries.find((e) => e.id === editingId)
+          : null;
+        const title = editing ? editing.title : "";
+        const slug = editing ? editing.slug : "";
+        const category = editing ? editing.category : CATEGORIES[0];
+        const clientType = editing ? editing.client_type : CLIENT_TYPES[0];
+        const manufacturer = editing ? editing.device_manufacturer || "" : "";
+        const model = editing ? editing.device_model || "" : "";
+        const date = editing
+          ? editing.date
+          : new Date().toISOString().slice(0, 10);
+        const problem = editing ? editing.problem || "" : "";
+        const workPerformed = editing ? editing.work_performed || "" : "";
+        const outcome = editing ? editing.outcome || "" : "";
+        const recommendation = editing ? editing.recommendation || "" : "";
+        const tags = editing ? (editing.tags || []).join(", ") : "";
+        const featured = editing ? editing.featured : false;
+        const published = editing ? editing.published : false;
 
-  slot.innerHTML = `
+        slot.innerHTML = `
     <div class="entry-form">
       <h3 class="form-section-title">Details</h3>
       <div class="grid2">
@@ -233,10 +517,10 @@ function renderForm(){
       </div>
       <div class="grid2">
         <div class="field"><label>Category</label>
-          <select id="f-category">${CATEGORIES.map(c=>`<option value="${c}" ${c===category?'selected':''}>${c}</option>`).join('')}</select>
+          <select id="f-category">${CATEGORIES.map((c) => `<option value="${c}" ${c === category ? "selected" : ""}>${c}</option>`).join("")}</select>
         </div>
         <div class="field"><label>Client type</label>
-          <select id="f-client-type">${CLIENT_TYPES.map(c=>`<option value="${c}" ${c===clientType?'selected':''}>${c}</option>`).join('')}</select>
+          <select id="f-client-type">${CLIENT_TYPES.map((c) => `<option value="${c}" ${c === clientType ? "selected" : ""}>${c}</option>`).join("")}</select>
         </div>
       </div>
       <div class="grid2">
@@ -250,233 +534,342 @@ function renderForm(){
       <div class="field"><label>Recommendation</label><textarea id="f-recommendation">${escapeHtml(recommendation)}</textarea></div>
       <div class="field"><label>Tags (comma separated)</label><input type="text" id="f-tags" value="${escapeHtml(tags)}" placeholder="e.g. RTX3050, ArchiCAD, thermal"></div>
 
-      <div id="candidateSection" style="display:${category==='PC Sourcing'?'block':'none'};">
+      <div id="candidateSection" style="display:${category === "PC Sourcing" ? "block" : "none"};">
         <h3 class="form-section-title">Candidate machines</h3>
         <div class="field-hint" style="margin:-6px 0 10px;">Only relevant for PC Sourcing. Record every machine considered, not just the one selected.</div>
-        <div id="candidateList">${(editing?.candidate_machines||[]).map(candidateRowHtml).join('')}</div>
+        <div id="candidateList">${(editing?.candidate_machines || []).map(candidateRowHtml).join("")}</div>
         <button type="button" class="ghost" id="candidateAdd">+ Add machine</button>
       </div>
 
       <h3 class="form-section-title">Evaluation checklist</h3>
-      <div class="field"><div id="vocab-checklist">${renderVocabBlock('checklist', editing?.checklist)}</div></div>
+      <div class="field"><div id="vocab-checklist">${renderVocabBlock("checklist", editing?.checklist)}</div></div>
 
       <h3 class="form-section-title">Related framework topics</h3>
-      <div class="field"><div id="vocab-framework">${renderVocabBlock('framework_topics', editing?.framework_topics)}</div></div>
+      <div class="field"><div id="vocab-framework">${renderVocabBlock("framework_topics", editing?.framework_topics)}</div></div>
 
       <div class="check-row" style="margin-top:var(--space-4);">
-        <label class="public-check"><input type="checkbox" id="f-featured" ${featured?'checked':''}> Featured on homepage</label>
-        <label class="public-check"><input type="checkbox" id="f-published" ${published?'checked':''}> Published (visible publicly)</label>
+        <label class="public-check"><input type="checkbox" id="f-featured" ${featured ? "checked" : ""}> Featured on homepage</label>
+        <label class="public-check"><input type="checkbox" id="f-published" ${published ? "checked" : ""}> Published (visible publicly)</label>
       </div>
 
       <div class="form-actions">
         <button class="ghost" id="f-cancel">Cancel</button>
-        <button class="plain" id="f-save">${editingId ? 'Save changes' : 'Save & continue'}</button>
+        <button class="plain" id="f-save">${editingId ? "Save changes" : "Save & continue"}</button>
       </div>
 
-      ${editing ? `
+      ${
+        editing
+          ? `
         <h3 class="form-section-title">Images</h3>
         <div class="field">
           <input type="file" id="f-images" multiple accept="image/*">
           <div class="field-hint">Uploads immediately. Pick one image below as the featured image for cards and the archive.</div>
         </div>
-        <div class="thumb-grid" id="thumb-grid">${(editing.images||[]).map(p=>thumbHtml(p, p===editing.featured_image)).join('')}</div>
+        <div class="thumb-grid" id="thumb-grid">${(editing.images || []).map((p) => thumbHtml(p, p === editing.featured_image)).join("")}</div>
         <div class="form-actions" style="justify-content:flex-end;">
           <button class="plain" id="f-done">Done</button>
         </div>
-      ` : ''}
+      `
+          : ""
+      }
     </div>
   `;
 
-  document.getElementById('f-cancel').onclick = ()=>{ formOpen=false; editingId=null; renderForm(); };
-  document.getElementById('f-save').onclick = saveDetails;
+        document.getElementById("f-cancel").onclick = () => {
+          formOpen = false;
+          editingId = null;
+          renderForm();
+        };
+        document.getElementById("f-save").onclick = saveDetails;
 
-  document.getElementById('f-category').onchange = (e)=>{
-    document.getElementById('candidateSection').style.display = e.target.value === 'PC Sourcing' ? 'block' : 'none';
-  };
-  document.getElementById('candidateAdd').onclick = ()=>{
-    document.getElementById('candidateList').insertAdjacentHTML('beforeend', candidateRowHtml());
-  };
-  document.getElementById('candidateList').addEventListener('click', (e)=>{
-    if(e.target.classList.contains('candidate-remove')) e.target.closest('.candidate-row').remove();
-  });
+        document.getElementById("f-category").onchange = (e) => {
+          document.getElementById("candidateSection").style.display =
+            e.target.value === "PC Sourcing" ? "block" : "none";
+        };
+        document.getElementById("candidateAdd").onclick = () => {
+          document
+            .getElementById("candidateList")
+            .insertAdjacentHTML("beforeend", candidateRowHtml());
+        };
+        document
+          .getElementById("candidateList")
+          .addEventListener("click", (e) => {
+            if (e.target.classList.contains("candidate-remove"))
+              e.target.closest(".candidate-row").remove();
+          });
 
-  if(editing){
-    document.getElementById('f-images').onchange = (e)=> handleImageUpload(e.target.files);
-    document.querySelectorAll('.thumb-remove').forEach(btn=>{
-      btn.onclick = ()=> removeImage(btn.dataset.path);
-    });
-    document.querySelectorAll('input[name="featured-image"]').forEach(radio=>{
-      radio.onchange = ()=> setFeaturedImage(radio.value);
-    });
-    document.getElementById('f-done').onclick = ()=>{ formOpen=false; editingId=null; renderForm(); };
-  }
-}
+        if (editing) {
+          document.getElementById("f-images").onchange = (e) =>
+            handleImageUpload(e.target.files);
+          document.querySelectorAll(".thumb-remove").forEach((btn) => {
+            btn.onclick = () => removeImage(btn.dataset.path);
+          });
+          document
+            .querySelectorAll('input[name="featured-image"]')
+            .forEach((radio) => {
+              radio.onchange = () => setFeaturedImage(radio.value);
+            });
+          document.getElementById("f-done").onclick = () => {
+            formOpen = false;
+            editingId = null;
+            renderForm();
+          };
+        }
+      }
 
-async function saveDetails(){
-  const title = document.getElementById('f-title').value.trim();
-  const date = document.getElementById('f-date').value;
-  const category = document.getElementById('f-category').value;
-  const clientType = document.getElementById('f-client-type').value;
-  if(!title || !date){ alert('Title and date are required.'); return; }
+      async function saveDetails() {
+        const title = document.getElementById("f-title").value.trim();
+        const date = document.getElementById("f-date").value;
+        const category = document.getElementById("f-category").value;
+        const clientType = document.getElementById("f-client-type").value;
+        if (!title || !date) {
+          alert("Title and date are required.");
+          return;
+        }
 
-  const baseSlug = document.getElementById('f-slug').value.trim() || slugify(title);
-  const payload = {
-    title,
-    category,
-    client_type: clientType,
-    device_manufacturer: document.getElementById('f-manufacturer').value.trim() || null,
-    device_model: document.getElementById('f-model').value.trim() || null,
-    date,
-    problem: document.getElementById('f-problem').value.trim() || null,
-    work_performed: document.getElementById('f-work').value.trim() || null,
-    outcome: document.getElementById('f-outcome').value.trim() || null,
-    recommendation: document.getElementById('f-recommendation').value.trim() || null,
-    tags: document.getElementById('f-tags').value.split(',').map(t=>t.trim()).filter(Boolean),
-    candidate_machines: getCandidateMachines(),
-    checklist: getVocabValues('checklist'),
-    framework_topics: getVocabValues('framework_topics'),
-    featured: document.getElementById('f-featured').checked,
-    published: document.getElementById('f-published').checked
-  };
+        const baseSlug =
+          document.getElementById("f-slug").value.trim() || slugify(title);
+        const payload = {
+          title,
+          category,
+          client_type: clientType,
+          device_manufacturer:
+            document.getElementById("f-manufacturer").value.trim() || null,
+          device_model: document.getElementById("f-model").value.trim() || null,
+          date,
+          problem: document.getElementById("f-problem").value.trim() || null,
+          work_performed:
+            document.getElementById("f-work").value.trim() || null,
+          outcome: document.getElementById("f-outcome").value.trim() || null,
+          recommendation:
+            document.getElementById("f-recommendation").value.trim() || null,
+          tags: document
+            .getElementById("f-tags")
+            .value.split(",")
+            .map((t) => t.trim())
+            .filter(Boolean),
+          candidate_machines: getCandidateMachines(),
+          checklist: getVocabValues("checklist"),
+          framework_topics: getVocabValues("framework_topics"),
+          featured: document.getElementById("f-featured").checked,
+          published: document.getElementById("f-published").checked,
+        };
 
-  const saveBtn = document.getElementById('f-save');
-  saveBtn.disabled = true;
-  let savedRow = null;
-  for(let attempt = 0; attempt < 8; attempt++){
-    const trySlug = attempt === 0 ? baseSlug : `${baseSlug}-${attempt+1}`;
-    const res = editingId
-      ? await sb.from('projects').update({ ...payload, slug: trySlug }).eq('id', editingId).select().single()
-      : await sb.from('projects').insert({ ...payload, slug: trySlug }).select().single();
-    if(!res.error){ savedRow = res.data; break; }
-    if(res.error.code !== '23505'){ alert('Save failed: ' + res.error.message); saveBtn.disabled = false; return; }
-  }
-  if(!savedRow){ alert('Could not save — too many slug conflicts.'); saveBtn.disabled = false; return; }
+        const saveBtn = document.getElementById("f-save");
+        saveBtn.disabled = true;
+        let savedRow = null;
+        for (let attempt = 0; attempt < 8; attempt++) {
+          const trySlug =
+            attempt === 0 ? baseSlug : `${baseSlug}-${attempt + 1}`;
+          const res = editingId
+            ? await sb
+                .from("projects")
+                .update({ ...payload, slug: trySlug })
+                .eq("id", editingId)
+                .select()
+                .single()
+            : await sb
+                .from("projects")
+                .insert({ ...payload, slug: trySlug })
+                .select()
+                .single();
+          if (!res.error) {
+            savedRow = res.data;
+            break;
+          }
+          if (res.error.code !== "23505") {
+            alert("Save failed: " + res.error.message);
+            saveBtn.disabled = false;
+            return;
+          }
+        }
+        if (!savedRow) {
+          alert("Could not save — too many slug conflicts.");
+          saveBtn.disabled = false;
+          return;
+        }
 
-  editingId = savedRow.id;
-  await loadEntries();
-  renderForm();
-}
+        editingId = savedRow.id;
+        await loadEntries();
+        renderForm();
+      }
 
-function editEntry(id){ editingId=id; formOpen=true; renderForm(); window.scrollTo({top:0, behavior:'smooth'}); }
+      function editEntry(id) {
+        editingId = id;
+        formOpen = true;
+        renderForm();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
 
-function sanitizeFilename(name){ return name.replace(/[^a-zA-Z0-9.\-]/g,'_'); }
+      function sanitizeFilename(name) {
+        return name.replace(/[^a-zA-Z0-9.\-]/g, "_");
+      }
 
-async function handleImageUpload(fileList){
-  const editing = entries.find(e=>e.id===editingId);
-  if(!editing) return;
-  for(const file of Array.from(fileList)){
-    const path = `${editing.slug}/${crypto.randomUUID()}-${sanitizeFilename(file.name)}`;
-    const { error: upErr } = await sb.storage.from('case-studies').upload(path, file);
-    if(upErr){ alert('Upload failed: ' + upErr.message); continue; }
-    editing.images = [...(editing.images||[]), path];
-    if(!editing.featured_image) editing.featured_image = path;
-    const { error: updErr } = await sb.from('projects').update({ images: editing.images, featured_image: editing.featured_image }).eq('id', editingId);
-    if(updErr) alert('Could not save image reference: ' + updErr.message);
-  }
-  renderForm();
-}
+      async function handleImageUpload(fileList) {
+        const editing = entries.find((e) => e.id === editingId);
+        if (!editing) return;
+        for (const file of Array.from(fileList)) {
+          const path = `${editing.slug}/${crypto.randomUUID()}-${sanitizeFilename(file.name)}`;
+          const { error: upErr } = await sb.storage
+            .from("case-studies")
+            .upload(path, file);
+          if (upErr) {
+            alert("Upload failed: " + upErr.message);
+            continue;
+          }
+          editing.images = [...(editing.images || []), path];
+          if (!editing.featured_image) editing.featured_image = path;
+          const { error: updErr } = await sb
+            .from("projects")
+            .update({
+              images: editing.images,
+              featured_image: editing.featured_image,
+            })
+            .eq("id", editingId);
+          if (updErr)
+            alert("Could not save image reference: " + updErr.message);
+        }
+        renderForm();
+      }
 
-async function removeImage(path){
-  if(!confirm('Remove this image?')) return;
-  const editing = entries.find(e=>e.id===editingId);
-  if(!editing) return;
-  await sb.storage.from('case-studies').remove([path]);
-  editing.images = (editing.images||[]).filter(p=>p!==path);
-  if(editing.featured_image === path) editing.featured_image = editing.images[0] || null;
-  const { error } = await sb.from('projects').update({ images: editing.images, featured_image: editing.featured_image }).eq('id', editingId);
-  if(error) alert('Update failed: ' + error.message);
-  renderForm();
-}
+      async function removeImage(path) {
+        if (!confirm("Remove this image?")) return;
+        const editing = entries.find((e) => e.id === editingId);
+        if (!editing) return;
+        await sb.storage.from("case-studies").remove([path]);
+        editing.images = (editing.images || []).filter((p) => p !== path);
+        if (editing.featured_image === path)
+          editing.featured_image = editing.images[0] || null;
+        const { error } = await sb
+          .from("projects")
+          .update({
+            images: editing.images,
+            featured_image: editing.featured_image,
+          })
+          .eq("id", editingId);
+        if (error) alert("Update failed: " + error.message);
+        renderForm();
+      }
 
-async function setFeaturedImage(path){
-  const editing = entries.find(e=>e.id===editingId);
-  if(!editing) return;
-  editing.featured_image = path;
-  const { error } = await sb.from('projects').update({ featured_image: path }).eq('id', editingId);
-  if(error) alert('Update failed: ' + error.message);
-}
+      async function setFeaturedImage(path) {
+        const editing = entries.find((e) => e.id === editingId);
+        if (!editing) return;
+        editing.featured_image = path;
+        const { error } = await sb
+          .from("projects")
+          .update({ featured_image: path })
+          .eq("id", editingId);
+        if (error) alert("Update failed: " + error.message);
+      }
 
-async function deleteEntry(id){
-  if(!confirm('Delete this case study? This also removes its uploaded images.')) return;
-  const e = entries.find(x=>x.id===id);
-  if(e && e.images && e.images.length){
-    await sb.storage.from('case-studies').remove(e.images);
-  }
-  const { error } = await sb.from('projects').delete().eq('id', id);
-  if(error){ alert('Delete failed: ' + error.message); return; }
-  await loadEntries();
-}
+      async function deleteEntry(id) {
+        if (
+          !confirm(
+            "Delete this case study? This also removes its uploaded images.",
+          )
+        )
+          return;
+        const e = entries.find((x) => x.id === id);
+        if (e && e.images && e.images.length) {
+          await sb.storage.from("case-studies").remove(e.images);
+        }
+        const { error } = await sb.from("projects").delete().eq("id", id);
+        if (error) {
+          alert("Delete failed: " + error.message);
+          return;
+        }
+        await loadEntries();
+      }
 
-async function toggleFeatured(id){
-  const e = entries.find(x=>x.id===id);
-  const { error } = await sb.from('projects').update({ featured: !e.featured }).eq('id', id);
-  if(error){ alert('Update failed: ' + error.message); return; }
-  await loadEntries();
-}
+      async function toggleFeatured(id) {
+        const e = entries.find((x) => x.id === id);
+        const { error } = await sb
+          .from("projects")
+          .update({ featured: !e.featured })
+          .eq("id", id);
+        if (error) {
+          alert("Update failed: " + error.message);
+          return;
+        }
+        await loadEntries();
+      }
 
-async function togglePublished(id){
-  const e = entries.find(x=>x.id===id);
-  const { error } = await sb.from('projects').update({ published: !e.published }).eq('id', id);
-  if(error){ alert('Update failed: ' + error.message); return; }
-  await loadEntries();
-}
+      async function togglePublished(id) {
+        const e = entries.find((x) => x.id === id);
+        const { error } = await sb
+          .from("projects")
+          .update({ published: !e.published })
+          .eq("id", id);
+        if (error) {
+          alert("Update failed: " + error.message);
+          return;
+        }
+        await loadEntries();
+      }
 
-function renderList(){
-  const slot = document.getElementById('listSlot');
-  const search = document.getElementById('search').value.toLowerCase();
-  const filterCat = document.getElementById('filterCat').value;
-  const filterClient = document.getElementById('filterClient').value;
-  const filterStatus = document.getElementById('filterStatus').value;
+      function renderList() {
+        const slot = document.getElementById("listSlot");
+        const search = document.getElementById("search").value.toLowerCase();
+        const filterCat = document.getElementById("filterCat").value;
+        const filterClient = document.getElementById("filterClient").value;
+        const filterStatus = document.getElementById("filterStatus").value;
 
-  let list = [...entries];
-  if(filterCat) list = list.filter(e=>e.category===filterCat);
-  if(filterClient) list = list.filter(e=>e.client_type===filterClient);
-  if(filterStatus === 'published') list = list.filter(e=>e.published);
-  if(filterStatus === 'draft') list = list.filter(e=>!e.published);
-  if(search){
-    list = list.filter(e =>
-      e.title.toLowerCase().includes(search) ||
-      (e.problem||'').toLowerCase().includes(search) ||
-      (e.work_performed||'').toLowerCase().includes(search) ||
-      (e.device_manufacturer||'').toLowerCase().includes(search) ||
-      (e.device_model||'').toLowerCase().includes(search) ||
-      (e.tags||[]).some(t=>t.toLowerCase().includes(search))
-    );
-  }
+        let list = [...entries];
+        if (filterCat) list = list.filter((e) => e.category === filterCat);
+        if (filterClient)
+          list = list.filter((e) => e.client_type === filterClient);
+        if (filterStatus === "published")
+          list = list.filter((e) => e.published);
+        if (filterStatus === "draft") list = list.filter((e) => !e.published);
+        if (search) {
+          list = list.filter(
+            (e) =>
+              e.title.toLowerCase().includes(search) ||
+              (e.problem || "").toLowerCase().includes(search) ||
+              (e.work_performed || "").toLowerCase().includes(search) ||
+              (e.device_manufacturer || "").toLowerCase().includes(search) ||
+              (e.device_model || "").toLowerCase().includes(search) ||
+              (e.tags || []).some((t) => t.toLowerCase().includes(search)),
+          );
+        }
 
-  if(list.length===0){
-    slot.innerHTML = `<div class="empty">No entries match.</div>`;
-    return;
-  }
+        if (list.length === 0) {
+          slot.innerHTML = `<div class="empty">No entries match.</div>`;
+          return;
+        }
 
-  slot.innerHTML = `<div class="grid">${list.map((e, i) => `
+        slot.innerHTML = `<div class="grid">${list
+          .map(
+            (e, i) => `
     <div class="ticket ${catClass(e.category)}" style="--i:${i}">
       <div class="ticket-head">
         <span class="no">${ticketNo(e.ticket_no)}</span>
         <span>${fmtDate(e.date)}</span>
         <span style="display:flex;gap:6px;">
-          ${e.featured ? `<span class="stamp star">featured</span>` : ''}
-          <span class="stamp ${e.published?'pub':'priv'}">${e.published?'published':'draft'}</span>
+          ${e.featured ? `<span class="stamp star">featured</span>` : ""}
+          <span class="stamp ${e.published ? "pub" : "priv"}">${e.published ? "published" : "draft"}</span>
         </span>
       </div>
       <div class="ticket-body">
         <span class="cat-badge ${catClass(e.category)}">${escapeHtml(e.category)}</span>
         <h3 style="margin-top:8px;">${escapeHtml(e.title)}</h3>
-        <p>${escapeHtml(e.client_type)}${(e.device_manufacturer||e.device_model) ? ' · ' + escapeHtml([e.device_manufacturer,e.device_model].filter(Boolean).join(' ')) : ''}</p>
-        ${e.problem ? `<div class="outcome"><b>Problem</b>${escapeHtml(e.problem)}</div>` : ''}
-        ${(e.tags && e.tags.length) ? `<div class="tags">${e.tags.map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+        <p>${escapeHtml(e.client_type)}${e.device_manufacturer || e.device_model ? " · " + escapeHtml([e.device_manufacturer, e.device_model].filter(Boolean).join(" ")) : ""}</p>
+        ${e.problem ? `<div class="outcome"><b>Problem</b>${escapeHtml(e.problem)}</div>` : ""}
+        ${e.tags && e.tags.length ? `<div class="tags">${e.tags.map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>` : ""}
       </div>
       <div class="ticket-actions">
         <button onclick="editEntry('${e.id}')">Edit</button>
-        <button onclick="toggleFeatured('${e.id}')">${e.featured?'Unfeature':'Feature'}</button>
-        <button onclick="togglePublished('${e.id}')">${e.published?'Unpublish':'Publish'}</button>
+        <button onclick="toggleFeatured('${e.id}')">${e.featured ? "Unfeature" : "Feature"}</button>
+        <button onclick="togglePublished('${e.id}')">${e.published ? "Unpublish" : "Publish"}</button>
         <button class="danger" onclick="deleteEntry('${e.id}')">Delete</button>
       </div>
     </div>
-  `).join('')}</div>`;
-}
+  `,
+          )
+          .join("")}</div>`;
+      }
 
-checkSession();
-</script>
-</body>
+      checkSession();
+    </script>
+  </body>
 </html>
