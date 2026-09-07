@@ -44,8 +44,8 @@
       <div class="wrap hero-inner">
         <div>
           <p class="kicker">Services</p>
-          <h1>Dual-Boot &amp; OS Setup</h1>
-          <p class="sub">
+          <h1 id="serviceTitle">Dual-Boot &amp; OS Setup</h1>
+          <p class="sub" id="serviceBody">
             Windows and Linux side by side, or a clean single-OS install done
             right — drivers, updates, and licensing sorted from the start.
           </p>
@@ -69,6 +69,12 @@
 
     <script>
       async function load() {
+        const services = await loadSiteContent("services");
+        const service = (services.items || []).find((item) => item.key === "dual-boot-os-setup");
+        if (service) {
+          setText("serviceTitle", service.title);
+          setText("serviceBody", [service.summary, service.description].filter(Boolean).join(" "));
+        }
         const { data, error } = await sb
           .from("projects")
           .select("*")

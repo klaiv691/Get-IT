@@ -51,7 +51,7 @@
     <main class="wrap">
       <div class="prose-section">
         <h2>Introduction</h2>
-        <p>
+        <p id="frameworkIntro">
           Every job that comes through Get-IT — a laptop inspection or a
           multi-system business IT project — goes through the same process:
           understand what you actually need, assess the technology against that
@@ -150,6 +150,8 @@
       }
 
       async function load() {
+        const frameworkContent = await loadSiteContent("framework_page");
+        setText("frameworkIntro", frameworkContent.intro);
         const { data: sections, error } = await sb
           .from("framework_sections")
           .select("*")

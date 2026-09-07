@@ -44,8 +44,8 @@
       <div class="wrap hero-inner">
         <div>
           <p class="kicker">Contact</p>
-          <h1>Let's talk about your technology.</h1>
-          <p class="sub">
+          <h1 id="contactHeroTitle">Let's talk about your technology.</h1>
+          <p class="sub" id="contactHeroBody">
             Whether it's a laptop you're about to buy, a workstation that's
             slowing you down, or a business system that needs attention — here's
             how to reach me.
@@ -57,7 +57,7 @@
       <div class="action-grid">
         <div class="action-card">
           <h3>PC Sourcing</h3>
-          <p>
+          <p id="contactSourcingBody">
             Can't find the right machine yourself? UGX 50,000 to start (UGX
             25,000 to resubscribe) — tell me your budget and specs and I'll find
             and verify matching options within a fixed 4–5 day window. No
@@ -78,7 +78,7 @@
         </div>
         <div class="action-card">
           <h3>Business Enquiries</h3>
-          <p>
+          <p id="contactBusinessBody">
             For Microsoft 365, networking, cybersecurity, maintenance, or ERP
             projects, email a short description of what you're working with and
             what you need — I'll reply with next steps.
@@ -86,7 +86,7 @@
           <a
             class="plain"
             href="mailto:marvinclive16@gmail.com?subject=Business%20Enquiry"
-            >Email Get-IT</a
+            id="businessEmail">Email Get-IT</a
           >
         </div>
       </div>
@@ -95,7 +95,7 @@
         <h3 style="margin: 0 0 6px; color: var(--navy); font-size: 17px">
           General Questions
         </h3>
-        <p style="margin: 0 0 16px; color: var(--ink-soft); font-size: 13.5px">
+        <p id="contactGeneralBody" style="margin: 0 0 16px; color: var(--ink-soft); font-size: 13.5px">
           Not sure which category your question falls into? Send a message below
           and I'll get back to you — usually within a day.
         </p>
@@ -137,7 +137,7 @@
 
       <div class="prose-section">
         <h2>Service Area</h2>
-        <p>
+        <p id="contactServiceArea">
           Get-IT is based in Kampala. On-site visits are available across the
           city for inspections, repairs, and business IT work; remote
           consultations and support are available for clients elsewhere in
@@ -150,17 +150,17 @@
         <ul class="hours-list">
           <li>
             <span class="day">Monday – Friday</span
-            ><span class="time">9:00 AM – 6:00 PM</span>
+            ><span class="time" id="hoursWeekdays">9:00 AM – 6:00 PM</span>
           </li>
           <li>
             <span class="day">Saturday</span
-            ><span class="time">10:00 AM – 2:00 PM</span>
+            ><span class="time" id="hoursSaturday">10:00 AM – 2:00 PM</span>
           </li>
           <li>
-            <span class="day">Sunday</span><span class="time">Closed</span>
+            <span class="day">Sunday</span><span class="time" id="hoursSunday">Closed</span>
           </li>
         </ul>
-        <p style="margin-top: 12px; color: var(--ink-soft); font-size: 13px">
+        <p id="contactUrgentNote" style="margin-top: 12px; color: var(--ink-soft); font-size: 13px">
           Urgent business IT issues (network down, security incident) — message
           on WhatsApp any time; I respond as soon as I can outside these hours.
         </p>
@@ -182,6 +182,35 @@
       serviceSelect.innerHTML =
         CATEGORIES.map((c) => `<option value="${c}">${c}</option>`).join("") +
         `<option value="Other">Other / not sure</option>`;
+
+      async function loadContactContent() {
+        const [content, settings] = await Promise.all([
+          loadSiteContent("contact_page"),
+          loadSiteContent("site_settings"),
+        ]);
+        setText("contactHeroTitle", content.hero_title);
+        setText("contactHeroBody", content.hero_body);
+        setText("contactSourcingBody", [content.sourcing_price, content.sourcing_body].filter(Boolean).join(" — "));
+        setText("contactBusinessBody", content.business_body);
+        setText("contactServiceArea", content.service_area);
+        setText("contactGeneralBody", content.general_body);
+        setText("contactUrgentNote", content.urgent_note);
+        const phoneLink = document.querySelector(".alt-contact a[href^='tel:']");
+        if (phoneLink && settings.phone) {
+          phoneLink.href = `tel:${settings.phone.replace(/[^+\d]/g, "")}`;
+          phoneLink.textContent = settings.phone;
+        }
+        const emailLink = document.getElementById("businessEmail");
+        if (emailLink && settings.email) {
+          emailLink.href = `mailto:${settings.email}?subject=Business%20Enquiry`;
+        }
+        if (settings.whatsapp) {
+          document.getElementById("waSourcing").href = waLink(settings.whatsapp, "Hi Get-IT, I'd like to start a PC sourcing search. Here's my budget and specs:");
+        }
+        setText("hoursWeekdays", settings.hours_weekdays);
+        setText("hoursSaturday", settings.hours_saturday);
+        setText("hoursSunday", settings.hours_sunday);
+      }
 
       document.getElementById("contactForm").onsubmit = async (e) => {
         e.preventDefault();
@@ -213,6 +242,7 @@
         resultEl.innerHTML = `<div class="form-success">Thanks — I'll get back to you within a day.</div>`;
         submitBtn.disabled = false;
       };
+      loadContactContent();
     </script>
   </body>
 </html>

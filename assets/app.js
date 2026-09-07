@@ -43,6 +43,38 @@ function storageUrl(path) {
   return sb.storage.from("case-studies").getPublicUrl(path).data.publicUrl;
 }
 
+async function loadSiteContent(contentKey) {
+  const { data, error } = await sb
+    .from("site_content")
+    .select("content")
+    .eq("content_key", contentKey)
+    .eq("published", true)
+    .maybeSingle();
+  return error || !data ? {} : data.content || {};
+}
+
+function setText(id, value) {
+  const element = document.getElementById(id);
+  if (element && value) element.textContent = value;
+}
+
+async function applySiteSettings() {
+  const settings = await loadSiteContent("site_settings");
+  if (settings.brand_name) {
+    document.querySelectorAll(".masthead h2").forEach((element) => {
+      element.textContent = settings.brand_name;
+    });
+  }
+  if (settings.owner || settings.tagline) {
+    const descriptor = [settings.owner, settings.tagline].filter(Boolean).join(" · ");
+    document.querySelectorAll(".masthead p").forEach((element) => {
+      element.textContent = descriptor;
+    });
+  }
+}
+
+document.addEventListener("DOMContentLoaded", applySiteSettings);
+
 const CATEGORIES = [
   "Inspection",
   "Repair",

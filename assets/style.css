@@ -1148,6 +1148,22 @@ a.ticket {
   padding: 12px;
   box-shadow: var(--shadow-sm);
 }
+.content-form {
+  margin-bottom: var(--space-5);
+}
+.content-form .form-section-title {
+  margin-top: 0;
+}
+.service-content-row {
+  border-top: 1px dashed var(--line);
+  padding-top: var(--space-4);
+  margin-top: var(--space-4);
+}
+.service-content-row:first-child {
+  border-top: none;
+  padding-top: 0;
+  margin-top: var(--space-3);
+}
 @media (max-width: 760px) {
   .admin-shell {
     grid-template-columns: 1fr;

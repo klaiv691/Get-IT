@@ -44,8 +44,8 @@
       <div class="wrap hero-inner">
         <div>
           <p class="kicker">Services</p>
-          <h1>Maintenance Programs</h1>
-          <p class="sub">
+          <h1 id="serviceTitle">Maintenance Programs</h1>
+          <p class="sub" id="serviceBody">
             Preventive maintenance and monitoring built into a routine, so small
             problems get caught before they become expensive ones.
           </p>
@@ -69,6 +69,12 @@
 
     <script>
       async function load() {
+        const services = await loadSiteContent("services");
+        const service = (services.items || []).find((item) => item.key === "maintenance-programs");
+        if (service) {
+          setText("serviceTitle", service.title);
+          setText("serviceBody", [service.summary, service.description].filter(Boolean).join(" "));
+        }
         const { data, error } = await sb
           .from("projects")
           .select("*")

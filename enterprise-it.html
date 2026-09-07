@@ -44,8 +44,8 @@
       <div class="wrap hero-inner">
         <div>
           <p class="kicker">Services</p>
-          <h1>Enterprise IT</h1>
-          <p class="sub">
+          <h1 id="serviceTitle">Enterprise IT</h1>
+          <p class="sub" id="serviceBody">
             Microsoft 365, networks, cybersecurity, infrastructure, and business
             systems like Odoo — the same assessment discipline applied at
             business scale.
@@ -122,6 +122,12 @@
 
     <script>
       async function load() {
+        const services = await loadSiteContent("services");
+        const service = (services.items || []).find((item) => item.key === "enterprise-it");
+        if (service) {
+          setText("serviceTitle", service.title);
+          setText("serviceBody", [service.summary, service.description].filter(Boolean).join(" "));
+        }
         const { data, error } = await sb
           .from("projects")
           .select("*")
